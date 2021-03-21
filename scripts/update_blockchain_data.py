@@ -178,6 +178,14 @@ config = {
         'addr': 'tz1UBZUkXpKGhYsP5KtzDNqLLchwF4uHrGjw',
         'name': 'comission_wallet',
         'assert_min_stamp': False,
+    }, {
+        'addr': 'KT1TybhR7XraG75JFYKSrh7KnxukMBT5dor6',
+        'name': 'curate_contract',
+        'assert_min_stamp': True,
+    }, {
+        'addr': 'KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW',
+        'name': 'hdao_contract',
+        'assert_min_stamp': True,
     }],
 }
 
