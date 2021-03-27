@@ -1,17 +1,17 @@
 import sys
-import time
-import datetime
 from pathlib import Path
-from tqdm import tqdm
-import requests
-
-repo_dir = Path('.').resolve()
-assert repo_dir.name == 'hicetnunc-dataset', repo_dir
+repo_dir = Path(__file__).parent.parent.resolve()
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 
-import lib.utils
-import lib.iter_tr
+import time
+import datetime
+from tqdm import tqdm
+import requests
+
+import src.utils
+import src.config
+import src.tr.iter
 
 
 def extract_ipfs_links(obj, res_set):
@@ -26,22 +26,15 @@ def extract_ipfs_links(obj, res_set):
             res_set.add(obj)
 
 
-stamp_step = 100000
-config_hash = 'cd9acbdf4c'
-transactions_dir = repo_dir / 'cache' / 'transactions' / config_hash
-assert transactions_dir.is_dir()
-
-ipfs0_dir = repo_dir / 'cache' / 'ipfs0'
-ipfs0_dir.mkdir(exist_ok=True)
-ipfs1_dir = repo_dir / 'cache' / 'ipfs1'
-ipfs1_dir.mkdir(exist_ok=True)
-
-
 def fetch_ipfs_ref(ref, ipfs_dir):
     assert ref.startswith('ipfs://')
     ref = ref.replace('ipfs://', '')
 
-    req = requests.get(f'https://cloudflare-ipfs.com/ipfs/{ref}')
+    if 1:
+        req = requests.get(f'https://cloudflare-ipfs.com/ipfs/{ref}')
+    else:
+        req = requests.get(f'https://ipfs.io/ipfs/{ref}')
+
     if req.status_code != 200:
         if req.status_code == 403 and req.text == 'ipfs: video streaming is not allowed\n':
             req = requests.get(f'https://ipfs.io/ipfs/{ref}')
@@ -51,7 +44,7 @@ def fetch_ipfs_ref(ref, ipfs_dir):
                 print('Too many requests to ipfs.io')
                 time.sleep(60)
                 return
-            
+
             else:
                 print(req.text)
                 raise Exception(f'Error during fetch {ref} from ipfs.io and cloudflare')
@@ -59,7 +52,7 @@ def fetch_ipfs_ref(ref, ipfs_dir):
         elif req.status_code in [524, 504, 404]:
             # timeout
             return
-                
+
         else:
             print(req.status_code, repr(req.text))
             raise Exception(f'Error during fetch {ref} from cloudflare')
@@ -73,7 +66,7 @@ def fetch_ipfs_ref(ref, ipfs_dir):
 
 def get_refs0_to_fetch():
     ref_set = set()
-    for tr in lib.iter_tr.iter_tr(transactions_dir, stamp_step):
+    for tr in src.tr.iter.iter_tr():
         extract_ipfs_links(tr, ref_set)
 
     print(f'{len(ref_set)} ipfs0 references found')
@@ -85,7 +78,7 @@ def get_refs0_to_fetch():
     ref_set = ref_set - invalid_refs
     print('Invalid refs0: ', invalid_refs)
 
-    existing_refs = set(['ipfs://' + fpath.name for fpath in ipfs0_dir.iterdir()])
+    existing_refs = set(['ipfs://' + fpath.name for fpath in src.config.ipfs0_dir.iterdir()])
 
     unexpected_refs = existing_refs - ref_set
     if unexpected_refs:
@@ -100,8 +93,8 @@ def get_refs0_to_fetch():
 
 def get_refs1_to_fetch():
     ref_set = set()
-    for meta0_file in tqdm(list(ipfs0_dir.iterdir())):
-        meta0_data = lib.utils.read_json(meta0_file)
+    for meta0_file in tqdm(list(src.config.ipfs0_dir.iterdir())):
+        meta0_data = src.utils.read_json(meta0_file)
         extract_ipfs_links(meta0_data, ref_set)
 
     print(f'{len(ref_set)} ipfs1 references found')
@@ -113,7 +106,7 @@ def get_refs1_to_fetch():
     ref_set = ref_set - invalid_refs
     print('Invalid refs1: ', invalid_refs)
 
-    existing_refs = set(['ipfs://' + fpath.name for fpath in ipfs1_dir.iterdir()])
+    existing_refs = set(['ipfs://' + fpath.name for fpath in src.config.ipfs1_dir.iterdir()])
 
     unexpected_refs = existing_refs - ref_set
     if unexpected_refs:
@@ -126,17 +119,10 @@ def get_refs1_to_fetch():
     return list(refs_to_fetch)
 
 
-if lib.utils.is_in_jupyter(globals()):
-    # If running in Jupyter, write script source to file
-    (repo_dir / 'scripts' / 'download_ipfs.py').write_text(
-        lib.utils.get_cur_jupyter_cell_source(globals()),
-        'utf-8',
-    )
-
-elif __name__ == '__main__':
+if __name__ == '__main__':
 
     for ref in tqdm(get_refs0_to_fetch()):
-        fetch_ipfs_ref(ref)
+        fetch_ipfs_ref(ref, src.config.ipfs0_dir)
 
     for ref in tqdm(get_refs1_to_fetch()):
-        fetch_ipfs_ref(ref, ipfs1_dir)
+        fetch_ipfs_ref(ref, src.config.ipfs1_dir)

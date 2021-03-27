@@ -1,15 +1,15 @@
 import sys
-import time
 from pathlib import Path
-from tqdm import tqdm
-import requests
-
-repo_dir = Path('.').resolve()
-assert repo_dir.name == 'hicetnunc-dataset', repo_dir
+repo_dir = Path(__file__).parent.parent.resolve()
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 
-import lib.utils
+import time
+from tqdm import tqdm
+import requests
+
+import src.utils
+import src.config
 
 
 def check_first_transaction_stamp(min_stamp, sender=None, receiver=None):
@@ -75,7 +75,12 @@ def get_transactions_hashes(min_stamp, max_stamp, sender=None, receiver=None):
 
 
 def get_full_transaction(transaction_hash):
-    req = requests.get(f'https://api.tzstats.com/explorer/op/{transaction_hash}')
+    try:
+        req = requests.get(f'https://api.tzstats.com/explorer/op/{transaction_hash}', timeout=5)
+    except Exception as e:
+        print('!!!', str(e))
+        return 'timeout'
+
     if req.status_code != 200:
         print('!!!', req.text)
         raise Exception(f'Server response is not 200 (tzstats/explorer/op)')
@@ -89,17 +94,17 @@ def update_transactions_cache_file(config_hash, min_stamp, stamp_step, addrs):
     assert min_stamp % stamp_step == 0
     max_stamp = min_stamp + stamp_step
 
-    transactions_file = transactions_cache_dir / config_hash / f'{min_stamp}.json'
+    transactions_file = src.config.transactions_dir / f'{min_stamp}.json'
 
     if transactions_file.exists():
         transactions_file_mtime = transactions_file.stat().st_mtime
-        if transactions_file_mtime > max_stamp + stamp_step * 3:
+        if transactions_file_mtime > max_stamp + stamp_step:
             return
 
-    print(f'min_stamp={min_stamp} ({lib.utils.stamp_to_iso_date(min_stamp)}),', end=' ')
+    print(f'min_stamp={min_stamp} ({src.utils.stamp_to_iso_date(min_stamp)}),', end=' ')
     sys.stdout.flush()
 
-    data = lib.utils.read_json(transactions_file)
+    data = src.utils.read_json(transactions_file)
     if data is None:
         data = {}
 
@@ -116,15 +121,28 @@ def update_transactions_cache_file(config_hash, min_stamp, stamp_step, addrs):
         print(unexpected_hashes)
         raise Exception(f'Found {len(unexpected_hashes)} unexpected hashes')
 
-    for tr_no, tr_hash in tqdm(enumerate(hashes_to_fetch), total=len(hashes_to_fetch)):
-        # print(f'{tr_no:-5d}/{len(hashes_to_fetch)} Fetching {tr_hash}...', end=' ')
-        # sys.stdout.flush()
+    try:
+        unfinished_count = 0
+        for tr_no, tr_hash in tqdm(enumerate(hashes_to_fetch), total=len(hashes_to_fetch)):
+            # print(f'{tr_no:-5d}/{len(hashes_to_fetch)} Fetching {tr_hash}...', end=' ')
+            # sys.stdout.flush()
 
-        data[tr_hash] = get_full_transaction(tr_hash)
+            res_val = get_full_transaction(tr_hash)
+            if res_val == 'timeout':
+                unfinished_count += 1
+                time.sleep(5)
+                continue
+            else:
+                # just slow down a little bit
+                time.sleep(0.3)
 
-        # print(len(data[tr_hash]))
+            data[tr_hash] = res_val
 
-    lib.utils.write_json(data, transactions_file)
+            # print(len(data[tr_hash]))
+    except Exception as e:
+        print('!!!', e)
+
+    src.utils.write_json(data, transactions_file)
 
 
 def check_min_stamps(config):
@@ -141,62 +159,19 @@ def check_min_stamps(config):
 
 
 def update_transactions_cache(config):
-    config_hash = get_config_hash(config)
+    config_hash = src.utils.get_fetch_transactions_config_hash(config)
     cur_stamp = int(time.time())
     stamp_step = config['stamp_step']
     addrs = [item['addr'] for item in config['addrs']]
-    
+
     print(f'config_hash={config_hash}')
 
     for min_stamp in range(config['min_stamp'], cur_stamp, stamp_step):
         update_transactions_cache_file(config_hash, min_stamp, stamp_step, addrs)
 
 
-def get_config_hash(config):
-    return lib.utils.get_md5_hash({
-        'min_stamp': config['stamp_step'],
-        'stamp_step': config['stamp_step'],
-        'addrs': [item['addr'] for item in config['addrs']],
-    })[:10]
+if __name__ == '__main__':
 
-
-transactions_cache_dir = repo_dir / 'cache' / 'transactions'
-
-
-config = {
-    'min_stamp':  1614500000, # Sun Feb 28 2021 08:13:20 GMT+0000
-    'stamp_step':     100000, # 1.15 days
-    'addrs': [{
-        'addr': 'KT1Hkg5qeNhfwpKW4fXvq7HGZB9z2EnmCCA9',
-        'name': 'art_house_contract',
-        'assert_min_stamp': True,
-    }, {
-        'addr': 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton',
-        'name': 'nft_contract',
-        'assert_min_stamp': True,
-    }, {
-        'addr': 'tz1UBZUkXpKGhYsP5KtzDNqLLchwF4uHrGjw',
-        'name': 'comission_wallet',
-        'assert_min_stamp': False,
-    }, {
-        'addr': 'KT1TybhR7XraG75JFYKSrh7KnxukMBT5dor6',
-        'name': 'curate_contract',
-        'assert_min_stamp': True,
-    }, {
-        'addr': 'KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW',
-        'name': 'hdao_contract',
-        'assert_min_stamp': True,
-    }],
-}
-
-
-if lib.utils.is_in_jupyter(globals()):
-    # If running in Jupyter, write script source to file
-    (repo_dir / 'scripts' / 'update_blockchain_data.py').write_text(
-        lib.utils.get_cur_jupyter_cell_source(globals()),
-        'utf-8',
-    )
-
-elif __name__ == '__main__':
+    config = src.config.fetch_transactions_config
     check_min_stamps(config)
     update_transactions_cache(config)
