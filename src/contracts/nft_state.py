@@ -10,16 +10,17 @@ class NFTState:
         self.tokens = {}
         self.next_token_id = 152
 
-    def apply_mint(self, row_id, token_id, count, creator, info_ipfs):
+    def apply_mint(self, row_id, token_id, count, creator, tokens_receiver, info_ipfs):
         assert token_id == self.next_token_id
         assert token_id not in self.tokens
         self.tokens[token_id] = {
             'creator': creator,
+            'tokens_receiver': tokens_receiver,
             'mint_count': count,
             'info_ipfs': info_ipfs,
             'mint_row_id': row_id,
             'own_counts': {
-                creator: count,
+                tokens_receiver: count,
             },
             'transfers': [],
         }
@@ -35,7 +36,9 @@ class NFTState:
             receiver = tx['to']
             token_id = int(tx['token_id'])
             token_own_counts = self.tokens[token_id]['own_counts']
-            assert sender != receiver
+            if sender == receiver:
+                diff[(sender, token_id)] = self.get_own_count(sender, token_id)
+                continue
             sender_count = self.get_own_count(sender, token_id)
             receiver_count = self.get_own_count(receiver, token_id)
             assert sender_count >= count

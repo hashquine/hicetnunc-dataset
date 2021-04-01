@@ -7,22 +7,23 @@ import src.utils
 class TrInfoDB:
     def __init__(self):
         self.db = src.utils.read_json(src.config.trs_info_file)
+        self.tr_by_hashc_cache = {}
         self.last_tr_chunk_read_cache = ('', None)
         self.make_index()
 
     def make_index(self):
         self.stamps_list = []
         self.min_row_ids_list = []
-        self.hash_to_db_idx = {}
+        self.hashc_to_db_idx = {}
 
         prev_max_row_id = 0
-        for db_idx, (tr_hash, stamp, min_row_id, max_row_id, fname) in enumerate(self.db):
+        for db_idx, (tr_hashc, stamp, min_row_id, max_row_id, fname) in enumerate(self.db):
             assert min_row_id <= max_row_id
             assert prev_max_row_id < min_row_id
             prev_max_row_id = max_row_id
             self.stamps_list.append(stamp)
             self.min_row_ids_list.append(min_row_id)
-            self.hash_to_db_idx[tr_hash] = db_idx
+            self.hashc_to_db_idx[tr_hashc] = db_idx
 
     def _read_trs_chunk_file(self, fname):
         cache_fname, cache_data = self.last_tr_chunk_read_cache
@@ -38,31 +39,63 @@ class TrInfoDB:
         return cache_data
 
     def _get_info_by_db_idx(self, db_idx):
-        tr_hash, stamp, min_row_id, max_row_id, fname = self.db[db_idx]
+        tr_hashc, stamp, min_row_id, max_row_id, fname = self.db[db_idx]
         return {
-            'hash': tr_hash,
+            'hash': tr_hashc.split('_')[0],
+            'hashc': tr_hashc,
             'stamp': stamp,
             'iso_date': src.utils.stamp_to_iso_date(stamp),
             'min_row_id': min_row_id,
             'max_row_id': max_row_id,
+            'db_idx': db_idx,
         }
 
-    def get_tr_info_by_row_id(self, row_id, prefix=''):
-        full_op = self.get_full_transaction_by_row_id(row_id, return_op=True)
-        stamp = src.utils.iso_date_to_stamp(full_op['time'])
+    def get_tr_info_by_row_id(self, row_id):
+        idx = bisect.bisect_left(self.min_row_ids_list, row_id)
+
+        candidates = []
+        try:
+            candidates.append(self._get_info_by_db_idx(idx))
+        except:
+            pass
+        try:
+            candidates.append(self._get_info_by_db_idx(idx - 1))
+        except:
+            pass
+
+        for cand in candidates:
+            if cand['min_row_id'] <= row_id <= cand['max_row_id']:
+                tr_info = cand
+                break
+        else:
+            raise Exception('Transaction not found')
+
         return {
-            f'{prefix}hash': full_op['hash'],
-            f'{prefix}stamp': stamp,
-            f'{prefix}iso_date': src.utils.stamp_to_iso_date(stamp),
+            **tr_info,
+            'row_id': row_id,
         }
 
-    def _get_full_transaction_by_db_idx(self, db_idx):
+    def _get_full_tr_by_db_idx(self, db_idx):
         db_entry = self.db[db_idx]
         fname = db_entry[4]
-        chunk_data = self._read_trs_chunk_file(fname)
-        tr_hash = db_entry[0]
-        assert tr_hash in chunk_data
-        return chunk_data[tr_hash]
+        tr_hashc = db_entry[0]
+        if tr_hashc not in self.tr_by_hashc_cache:
+            chunk_data = self._read_trs_chunk_file(fname)
+            tr_hash = tr_hashc.split('_')[0]
+            tr_op_no = int(tr_hashc.split('_')[1])
+            assert tr_hash in chunk_data
+            self.tr_by_hashc_cache[tr_hashc] = [
+                op
+                for op in chunk_data[tr_hash]
+                if op['op_c'] == tr_op_no
+            ]
+        return self.tr_by_hashc_cache[tr_hashc]
+
+    def get_full_tr_by_hashc(self, tr_hashc):
+        if tr_hashc not in self.tr_by_hashc_cache:
+            db_idx = self.hashc_to_db_idx[tr_hashc]
+            self.tr_by_hashc_cache[tr_hashc] = self._get_full_tr_by_db_idx(db_idx)
+        return self.tr_by_hashc_cache[tr_hashc]
 
     def get_last_row_id_before_stamp(self, stamp):
         idx = bisect.bisect_left(self.stamps_list, stamp)
@@ -77,19 +110,14 @@ class TrInfoDB:
             raise Exception(f'No transactions after stamp {stamp}')
         return self.db[db_idx][3]
 
-    def get_full_transaction_by_row_id(self, row_id, return_op=False):
-        idx = bisect.bisect_left(self.min_row_ids_list, row_id)
-        cand0 = self._get_full_transaction_by_db_idx(
-            max(0, min(len(self.db) - 1, idx))
-        )
-        cand1 = self._get_full_transaction_by_db_idx(
-            max(0, min(len(self.db) - 1, idx - 1))
-        )
-        for tr in [cand0, cand1]:
-            for op in tr:
-                if op['row_id'] == row_id:
-                    if return_op:
-                        return op
-                    else:
-                        return tr
+    def get_full_tr_by_row_id(self, row_id, return_op=False):
+        tr_info = self.get_tr_info_by_row_id(row_id)
+        full_tr = self._get_full_tr_by_db_idx(tr_info['db_idx'])
+
+        for op in full_tr:
+            if op['row_id'] == row_id:
+                if return_op:
+                    return op
+                else:
+                    return full_tr
         raise Exception(f'Transaction with row_id={row_id} not in local database')

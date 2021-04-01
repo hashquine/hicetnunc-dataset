@@ -30,7 +30,7 @@ def parse_ops(ops):
         if op_status == 'applied':
             pass
 
-        elif op_status == 'backtracked':
+        elif op_status in ['backtracked', 'skipped']:
             continue
 
         elif op_status == 'failed':
@@ -83,17 +83,19 @@ def parse_ops(ops):
             assert op is ops[1]
             continue
 
-        assert params['entrypoint'] == params['call']
+        elif call == 'update_operators':
+            continue
 
+        assert params['entrypoint'] == params['call']
 
         if call == 'transfer':
             assert op['entrypoint_id'] == 6
             assert params['branch'] == 'RRL'
             assert params['id'] == 6
-            assert set(value.keys()) == { 'transfer' }
+            assert set(value.keys()) == {'transfer'}
             assert type(value['transfer']) is list
             assert len(value['transfer']) == 1
-            assert set(value['transfer'][0].keys()) == { 'from_', 'txs' }
+            assert set(value['transfer'][0].keys()) == {'from_', 'txs'}
             assert value['transfer'][0]['from_']
             assert len(value['transfer'][0]['txs']) >= 1
 
@@ -134,10 +136,10 @@ def parse_ops(ops):
             assert op['entrypoint_id'] == 2
             assert params['branch'] == 'LRL'
             assert params['id'] == 2
-            assert set(value.keys()) == { 'address', 'amount', 'token_id', 'token_info' }
+            assert set(value.keys()) == {'address', 'amount', 'token_id', 'token_info'}
             assert int(value['amount'])
             assert int(value['token_id'])
-            assert value['address'] == op['creator']
+            # assert value['address'] == op['creator']
             assert set(value['token_info'].keys()) == {'0@bytes'}
             assert value['token_info']['0@bytes'].startswith('ipfs://')
             assert storage_value['all_tokens'] == str(int(value['token_id']) + 1)
@@ -160,7 +162,8 @@ def parse_ops(ops):
                 row_id=op_row_id,
                 token_id=int(value['token_id']),
                 count=int(value['amount']),
-                creator=value['address'],
+                creator=op['creator'],
+                tokens_receiver=value['address'],
                 info_ipfs=value['token_info']['0@bytes'],
             )
 

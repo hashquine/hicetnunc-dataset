@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+repo_dir = Path(__file__).parent.parent.resolve()
+if str(repo_dir) not in sys.path:
+    sys.path.append(str(repo_dir))
+
+
 def reload():
     import importlib
     import src.reload
@@ -9,9 +16,12 @@ def _reload():
 
     import importlib
 
+    import src
     import src.utils
     import src.config
     import src.ipfs
+    import src.datasets
+    import src.formatters.md_fields_schema
     import src.tr.iter
     import src.tr.utils
     import src.tr.info_db
@@ -22,9 +32,13 @@ def _reload():
     import src.contracts.art_house_parser
     import src.contracts.money_state
     import src.contracts.money_parser
+    import src.contracts.addrs_state
 
     importlib.reload(src.utils)
     importlib.reload(src.config)
+    importlib.reload(src.ipfs)
+    importlib.reload(src.datasets)
+    importlib.reload(src.formatters.md_fields_schema)
     importlib.reload(src.tr.utils)
     importlib.reload(src.tr.info_db)
     importlib.reload(src.tr.iter)
@@ -35,3 +49,8 @@ def _reload():
     importlib.reload(src.contracts.art_house_parser)
     importlib.reload(src.contracts.money_state)
     importlib.reload(src.contracts.money_parser)
+    importlib.reload(src.contracts.addrs_state)
+
+
+if __name__ == '__main__':
+    reload()

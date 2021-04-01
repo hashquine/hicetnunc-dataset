@@ -28,82 +28,105 @@ def parse_trs(trs):
         }
 
         if nft_calls == {'transfer': 1}:
-            assert last_nft_op['parameters']['call'] == 'transfer'
-            transfer = last_nft_op['parameters']['value']['transfer']
+
+            tr_ops = tr['ops']
+
+            first_contract = tr['ops'][0]['receiver']
+            first_call = tr['ops'][0]['parameters']['call']
+
+            if (first_contract, first_call) in [
+                ('KT1MMLb2FVrrE9Do74J3FH1RNNc4QhDuVCNX', 'launchExchange'),
+                ('KT1HzEyact4wXoST7hTAGqoKiKkPvAwt4rCR', 'tezToTokenPayment'),
+                ('KT1HzEyact4wXoST7hTAGqoKiKkPvAwt4rCR', 'tokenToTezPayment'),
+                ('KT1HzEyact4wXoST7hTAGqoKiKkPvAwt4rCR', 'investLiquidity'),
+            ]:
+                continue
+
+            assert len(tr_ops) in [6]
+
+            if len(tr['ops']) == 7:
+                assert tr['ops'][0]['type'] == 'reveal'
+                tr_ops = tr['ops'][1:]
+
+            assert len(tr_ops) == 6
+
+            # get buyer money
+            assert tr_ops[0]['parameters']['call'] == 'collect'
+            assert tr_ops[0]['receiver'] == src.config.name2addr['art_house_contract']
+            assert tr_ops[0]['volume'] > 0
+            payer = tr_ops[0]['sender']
+            price = tr_ops[0]['volume']
+
+            # pay royalties
+            assert 'parameters' not in tr_ops[1]
+            assert tr_ops[1]['volume'] > 0
+            royalties_receiver = tr_ops[1]['receiver']
+            royalties = tr_ops[1]['volume']
+
+            # pay comission
+            assert 'parameters' not in tr_ops[2]
+            assert tr_ops[2]['receiver'] == src.config.name2addr['comission_wallet']
+            assert tr_ops[2]['volume'] > 0
+            comission = tr_ops[2]['volume']
+
+            # pay to seller
+            assert 'parameters' not in tr_ops[3]
+            assert tr_ops[3]['volume'] > 0
+            seller = tr_ops[3]['receiver']
+            seller_income = tr_ops[3]['volume']
+
+            # give hDAO tokens
+            assert tr_ops[4]['receiver'] == src.config.name2addr['hdao_contract']
+            assert tr_ops[4]['parameters']['call'] == 'hDAO_batch'
+            assert tr_ops[4]['volume'] == 0
+
+            # transfer NFT
+            assert tr_ops[5]['parameters']['call'] == 'transfer'
+            assert tr_ops[5]['receiver'] == src.config.name2addr['nft_contract']
+            assert tr_ops[5]['volume'] == 0
+
+            transfer = tr_ops[5]['parameters']['value']['transfer']
             assert len(transfer) == 1
             sender = transfer[0]['from_']
 
-            # when the first transfer between users (with non-zero price) will happen,
+            # when the first transfer between users (with non-zero XTZ volume) will happen,
             # this assert will fail
             assert sender == src.config.name2addr['art_house_contract']
-            assert money_delta[src.config.name2addr['art_house_contract']] < 1e-10
 
             assert len(transfer[0]['txs']) == 1
             receiver = transfer[0]['txs'][0]['to_']
 
             token_id = int(transfer[0]['txs'][0]['token_id'])
             token_count = int(transfer[0]['txs'][0]['amount'])
-            comission_wallet_income = money_delta[src.config.name2addr['comission_wallet']]
-
-            beneficiaries = {}
-            payers = {}
-            for addr, delta in money_delta.items():
-                if addr in [
-                    src.config.name2addr['art_house_contract'],
-                    src.config.name2addr['comission_wallet'],
-                ]:
-                    continue
-                if delta > 0:
-                    beneficiaries[addr] = delta
-                elif delta < 0:
-                    payers[addr] = delta
-
-            if receiver == src.config.name2addr['comission_wallet']:
-                assert len(payers) == 0
-                assert len(beneficiaries) == 1
-                beneficiary = list(beneficiaries)[0]
-                payer = src.config.name2addr['comission_wallet']
-                assert comission_wallet_income < 0
-                price = abs(comission_wallet_income) / (1.0 - 0.025)
-                comission = price * 0.025
-
-            elif len(beneficiaries) == 0:
-                assert len(payers) == 1
-                payer = list(payers)[0]
-                assert money_delta[payer] == -comission_wallet_income
-                assert comission_wallet_income > 0
-                price = abs(comission_wallet_income)
-                beneficiary = src.config.name2addr['comission_wallet']
-                comission = price * 0.025
-
-            else:
-                assert len(payers) == 1
-                assert len(beneficiaries) == 1
-                assert comission_wallet_income > 0
-                comission = comission_wallet_income
-                payer = list(payers)[0]
-                price = -money_delta[payer]
-                beneficiary = list(beneficiaries)[0]
-
-            assert type(payer) is str
-            assert type(beneficiary) is str
-            assert price > 0
-            assert comission > 0
-            assert abs(comission - price * 0.025) < 1e-6
 
             money_state.apply_swap_sell(
                 row_id=last_nft_op['row_id'],
                 token_id=token_id,
                 token_count=token_count,
                 payer=payer,
-                beneficiary=beneficiary,
                 price=price,
+                seller=seller,
+                seller_income=seller_income,
                 comission=comission,
+                royalties_receiver=royalties_receiver,
+                royalties=royalties,
             )
             continue
 
         assert nft_calls == {}
+
+        if 'parameters' in tr['ops'][0]:
+            if tr['ops'][0]['parameters']['call'] in [
+                'launchExchange', 'tokenToTezPayment', 'investLiquidity',
+                'tezToTokenPayment', 'divestLiquidity',
+            ]:
+                continue
+
         known_money_addrs = set(known_money_delta.keys())
+        if known_money_addrs in [{'baking_benjamins'}, set()]:
+            for op in tr['ops']:
+                assert op['receiver'] not in src.config.addr2name
+            continue
 
         assert 'comission_wallet' in known_money_addrs
 
@@ -111,7 +134,7 @@ def parse_trs(trs):
             assert known_money_addrs == {'baking_benjamins', 'comission_wallet'}
             assert known_money_delta['baking_benjamins'] < 0
             assert known_money_delta['comission_wallet'] > 0
-            assert known_money_delta['comission_wallet'] < -known_money_delta['baking_benjamins']
+            assert known_money_delta['comission_wallet'] <= -known_money_delta['baking_benjamins']
             money_state.apply_comission_wallet_baking_percent(
                 row_id=tr['ops'][0]['row_id'],
                 sender=src.config.name2addr['baking_benjamins'],

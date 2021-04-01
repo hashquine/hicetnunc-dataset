@@ -14,8 +14,6 @@ ipfs1_dir = cache_dir / 'ipfs1'
 ipfs1_dir.mkdir(exist_ok=True)
 previews_dir = cache_dir / 'previews'
 previews_dir.mkdir(exist_ok=True)
-previews_thumbs_dir = cache_dir / 'previews_thumbs'
-previews_thumbs_dir.mkdir(exist_ok=True)
 
 parsed_transactions_dir = cache_dir / 'parsed_transactions'
 parsed_transactions_dir.mkdir(exist_ok=True)
@@ -23,6 +21,7 @@ nft_state_log_file = parsed_transactions_dir / 'nft_state_log.json'
 ah_state_log_file = parsed_transactions_dir / 'ah_state_log.json'
 money_state_log_file = parsed_transactions_dir / 'money_state_log.json'
 trs_info_file = parsed_transactions_dir / 'trs_info.json'
+addrs_state_log_file = parsed_transactions_dir / 'addrs_state_log.json'
 tzktio_accounts_metadata_file = cache_dir / 'accounts_metadata' / 'tzktio_accounts_metadata.json'
 tzktio_accounts_metadata_file.parent.mkdir(exist_ok=True)
 
@@ -30,7 +29,10 @@ dataset_dir = repo_dir / 'dataset'
 dataset_dir.mkdir(exist_ok=True)
 tokens_db_json_file = dataset_dir / 'tokens_db.json'
 swaps_db_json_file = dataset_dir / 'swaps_db.json'
+addrs_db_json_file = dataset_dir / 'addrs_db.json'
 
+datasets_fields_file = cache_dir / 'schemas' / 'datasets_fields.json'
+datasets_fields_file.parent.mkdir(exist_ok=True)
 
 name2addr = {
     'art_house_contract': 'KT1Hkg5qeNhfwpKW4fXvq7HGZB9z2EnmCCA9',
@@ -71,3 +73,19 @@ fetch_transactions_config = {
 fetch_transactions_config_hash = src.utils.get_fetch_transactions_config_hash(fetch_transactions_config)
 
 transactions_dir = repo_dir / 'cache' / 'transactions' / fetch_transactions_config_hash
+
+previews_config = {
+    'ps_1000x1000': {
+        'type': 'render',
+        'extension': '.jpeg',
+        'resolution': [1000, 1000],
+        'service': 'preview-service',
+    },
+    'thumbs_256x256': {
+        'type': 'thumb',
+        'extension': '.jpeg',
+        'resolution': [256, 256],
+        'sources': ['ps_1000x1000'],
+        'service': 'preview-service',
+    },
+}

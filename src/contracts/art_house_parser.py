@@ -28,7 +28,7 @@ def parse_ops(ops):
         if op_status == 'applied':
             pass
 
-        elif op_status == 'backtracked':
+        elif op_status in ['backtracked', 'skipped']:
             continue
 
         elif op_status == 'failed':
@@ -163,7 +163,7 @@ def parse_ops(ops):
             objkt_id = ah_state.next_token_id
             ah_state.apply_mint(
                 row_id=op_row_id,
-                creator=value['address'],
+                tokens_receiver=value['address'],
                 count=int(value['amount']),
                 info_ipfs=value['metadata'],
                 royalties=int(value['royalties']),

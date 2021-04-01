@@ -9,12 +9,12 @@ class ArtHouseState:
         self.tokens = {}
         self.next_token_id = 152
 
-    def apply_mint(self, row_id, creator, count, info_ipfs, royalties):
+    def apply_mint(self, row_id, tokens_receiver, count, info_ipfs, royalties):
         token_id = self.next_token_id
         self.next_token_id += 1
         self.tokens[token_id] = {
             'mint_ah_row_id': row_id,
-            'creator': creator,
+            'tokens_receiver': tokens_receiver,
             'info_ipfs': info_ipfs,
             'mint_count': count,
             'royalties': royalties,
@@ -32,7 +32,6 @@ class ArtHouseState:
             'price': price,
             'active': True,
         }
-        # TODO: check sender is token creator
 
     def apply_cancel_swap(self, row_id, swap_id):
         assert self.swaps[swap_id]['active']

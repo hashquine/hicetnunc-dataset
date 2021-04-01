@@ -24,13 +24,25 @@ def iter_tr_inner(transactions_dir, stamp_step):
         transactions.sort(key=lambda it: it[0]['row_id'])
 
         for tr in transactions:
-            yield {
-                'hash': tr[0]['hash'],
-                'fpath': tr_file,
-                'time': tr[0]['time'],
-                'stamp': src.utils.iso_date_to_stamp(tr[0]['time']),
-                'ops': tr,
-            }
+            by_internal_index = []
+            for op in tr:
+                op_c = op['op_c']
+                if op_c == len(by_internal_index):
+                    by_internal_index.append([op])
+                elif op_c == len(by_internal_index) - 1:
+                    by_internal_index[-1].append(op)
+                else:
+                    raise Exception(f'Unexpected internal index: {op_c} / {len(by_internal_index) - 1}')
+            for op_c, ops in enumerate(by_internal_index):
+                yield {
+                    'hash': ops[0]['hash'],
+                    'hash_c': ops[0]['hash'] + '_' + str(op_c),
+                    'op_c': op_c,
+                    'fpath': tr_file,
+                    'time': ops[0]['time'],
+                    'stamp': src.utils.iso_date_to_stamp(ops[0]['time']),
+                    'ops': ops,
+                }
     sys.stdout.flush()
     print()
 
