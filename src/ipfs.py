@@ -24,7 +24,7 @@ def get_ipfs_fpath(ipfs_uri, dir_name):
     assert dir_path.is_dir()
     fpath = dir_path / ipfs_hash
     if not fpath.is_file():
-        raise IpfsNotCachedException()
+        raise IpfsNotCachedException(ipfs_uri)
     return fpath
 
 
@@ -57,7 +57,12 @@ def make_media_db():
     print('Making media db...')
     media_db = {}
     for token_id, token_db_entry in tqdm(list(nft_state.tokens.items())):
-        info_fpath = src.ipfs.get_ipfs_fpath(token_db_entry['info_ipfs'], 'ipfs0')
+        try:
+            info_fpath = src.ipfs.get_ipfs_fpath(token_db_entry['info_ipfs'], 'ipfs0')
+        except Exception as e:
+            print(token_id, token_db_entry)
+            raise e
+
         token_info = src.utils.read_json(info_fpath)
 
         assert len(token_info['formats']) == 1

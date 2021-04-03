@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-repo_dir = Path(__file__).parent.parent.resolve()
+repo_dir = Path(__file__).resolve().parent.parent
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 
@@ -14,6 +14,9 @@ import src.contracts.money_parser
 import src.contracts.addrs_state
 
 
+max_time = sys.argv[1] if len(sys.argv) >= 2 else '2100-01-01T00:00:00Z'
+
+
 nft_ops = []
 art_house_ops = []
 money_trs = []
@@ -25,6 +28,9 @@ addrs_state = src.contracts.state_utils.StateRecorder(addrs_state)
 print('Filtering NFT, ArtHouse and money ops...')
 
 for tr in src.tr.iter.iter_tr():
+    if tr['time'] >= max_time:
+        continue
+
     trs_info.append([
         tr['hash_c'],
         src.utils.iso_date_to_stamp(tr['time']),

@@ -278,12 +278,12 @@ All users, who ever created or owned NFT token.
     <td><code>100</code><br><code>10</code><br><code>1.25</code><br><code>2.5</code><br><code>33.7</code><br><code>1.325</code></td>
     <td>Prices of available works (in swaps) both by author and other users in XTZ.</td>
 </tr><tr>
-    <td><code>in_tr_count</code></td>
+    <td><code>in_op_count</code></td>
     <td><code>integer</code></td>
     <td><code>25</code></td>
     <td>Number of incoming transactions</td>
 </tr><tr>
-    <td><code>out_tr_count</code></td>
+    <td><code>out_op_count</code></td>
     <td><code>integer</code></td>
     <td><code>33</code></td>
     <td>Number of outcoming transactions</td>
@@ -300,7 +300,7 @@ All users, who ever created or owned NFT token.
 </tr><tr>
     <td colspan="4" align="center"><b>Auxiliary fields</b></td>
 </tr><tr>
-    <td><code>first_tr_has_reveal</code></td>
+    <td><code>first_op_has_reveal</code></td>
     <td><code>boolean</code></td>
     <td><code>1</code> <code>0</code></td>
     <td>Whether first interaction with hicetnunc was the first transaction in Tezos for user</td>

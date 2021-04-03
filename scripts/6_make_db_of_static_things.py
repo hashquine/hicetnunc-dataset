@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-repo_dir = Path(__file__).parent.parent.resolve()
+repo_dir = Path(__file__).resolve().parent.parent
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 
@@ -157,14 +157,14 @@ if __name__ == '__main__':
         try:
             artifact_fpath = src.ipfs.get_ipfs_fpath(token_db_entry['artifact_ipfs'], 'ipfs1')
             token_db_entry['artifact_file_size'] = artifact_fpath.stat().st_size
-        except IpfsNotCachedException:
+        except src.ipfs.IpfsNotCachedException:
             not_in_cache_count += 1
 
         if token_db_entry['display_uri_ipfs'] != '':
             try:
                 display_uri_fpath = src.ipfs.get_ipfs_fpath(token_db_entry['display_uri_ipfs'], 'ipfs1')
                 token_db_entry['display_uri_file_size'] = display_uri_fpath.stat().st_size
-            except IpfsNotCachedException:
+            except src.ipfs.IpfsNotCachedException:
                 not_in_cache_count += 1
         else:
             token_db_entry['display_uri_file_size'] = -1

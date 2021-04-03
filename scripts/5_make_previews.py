@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-repo_dir = Path(__file__).parent.parent.resolve()
+repo_dir = Path(__file__).resolve().parent.parent
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 

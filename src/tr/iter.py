@@ -5,7 +5,7 @@ import src.config
 
 
 def get_tr_files(transactions_dir, stamp_step):
-    res = list(transactions_dir.iterdir())
+    res = [fpath for fpath in transactions_dir.iterdir() if 'invalid' not in fpath.name]
     res.sort(key=lambda f: int(f.stem))
 
     stamps = [int(fpath.stem) for fpath in res]
@@ -53,11 +53,12 @@ def iter_tr(
 ):
     prev_stamp = 0
     prev_row_id = 0
+    prev_tr = '-'
     for tr in iter_tr_inner(transactions_dir, stamp_step):
         for op in tr['ops']:
             assert op['hash'] == tr['hash']
             assert op['time'] == tr['time']
-            assert prev_row_id < op['row_id']
+            assert prev_row_id < op['row_id'], (prev_row_id, op['row_id'], prev_tr['hash'], prev_tr['fpath'], op['hash'], tr['fpath'])
             prev_row_id = op['row_id']
 
         file_min_stamp = int(tr['fpath'].stem)
@@ -66,6 +67,8 @@ def iter_tr(
         assert file_min_stamp <= tr['stamp'] < file_max_stamp, (tr['fpath'], tr['stamp'], stamp_step)
 
         assert prev_stamp <= tr['stamp'], tr['hash']
-        prev_stamp = tr['stamp']
 
         yield tr
+
+        prev_stamp = tr['stamp']
+        prev_tr = tr

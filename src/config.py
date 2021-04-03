@@ -22,16 +22,15 @@ ah_state_log_file = parsed_transactions_dir / 'ah_state_log.json'
 money_state_log_file = parsed_transactions_dir / 'money_state_log.json'
 trs_info_file = parsed_transactions_dir / 'trs_info.json'
 addrs_state_log_file = parsed_transactions_dir / 'addrs_state_log.json'
+tokens_db_json_file = parsed_transactions_dir / 'tokens_db.json'
+swaps_db_json_file = parsed_transactions_dir / 'swaps_db.json'
+addrs_db_json_file = parsed_transactions_dir / 'addrs_db.json'
 tzktio_accounts_metadata_file = cache_dir / 'accounts_metadata' / 'tzktio_accounts_metadata.json'
 tzktio_accounts_metadata_file.parent.mkdir(exist_ok=True)
 
 dataset_dir = repo_dir / 'dataset'
 dataset_dir.mkdir(exist_ok=True)
-tokens_db_json_file = dataset_dir / 'tokens_db.json'
-swaps_db_json_file = dataset_dir / 'swaps_db.json'
-addrs_db_json_file = dataset_dir / 'addrs_db.json'
-
-datasets_fields_file = cache_dir / 'schemas' / 'datasets_fields.json'
+datasets_fields_file = dataset_dir / 'fields_list.json'
 datasets_fields_file.parent.mkdir(exist_ok=True)
 
 name2addr = {

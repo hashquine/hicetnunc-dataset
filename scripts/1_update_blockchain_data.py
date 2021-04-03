@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-repo_dir = Path(__file__).parent.parent.resolve()
+repo_dir = Path(__file__).resolve().parent.parent
 if str(repo_dir) not in sys.path:
     sys.path.append(str(repo_dir))
 
@@ -102,7 +102,12 @@ def update_transactions_cache_file(config_hash, min_stamp, stamp_step, addrs, fo
     if not force_check and transactions_file.exists():
         transactions_file_mtime = transactions_file.stat().st_mtime
         if transactions_file_mtime > max_stamp + stamp_step:
-            return
+            for tr_hash, tr_val in src.utils.read_json(transactions_file).items():
+                if tr_val is None:
+                    break
+            else:
+                # If there are no empty entries, do not perform check
+                return
 
     print(f'min_stamp={min_stamp} ({src.utils.stamp_to_iso_date(min_stamp)}),', end=' ')
     sys.stdout.flush()
@@ -111,30 +116,41 @@ def update_transactions_cache_file(config_hash, min_stamp, stamp_step, addrs, fo
     if data is None:
         data = {}
 
-    print(f'{len(data)} existing entries')
+    existing_hashes = set()
+    for tr_hash, tr_val in data.items():
+        if tr_val is not None:
+            existing_hashes.add(tr_hash)
+
+    print(f'{len(data)} existing entries, {len(existing_hashes)} non-empty')
 
     transactions_hashes = set()
     for addr in addrs:
         transactions_hashes.update(get_transactions_hashes(min_stamp, max_stamp, sender=addr))
         transactions_hashes.update(get_transactions_hashes(min_stamp, max_stamp, receiver=addr))
 
-    hashes_to_fetch = transactions_hashes - set(data.keys())
-    unexpected_hashes = set(data.keys()) - transactions_hashes
+    hashes_to_fetch = transactions_hashes - existing_hashes
+    unexpected_hashes = existing_hashes - transactions_hashes
     if unexpected_hashes:
         print(unexpected_hashes)
         raise Exception(f'Found {len(unexpected_hashes)} unexpected hashes')
 
+    for tr_hash in hashes_to_fetch:
+        data[tr_hash] = None
+
+    last_save_stamp = 0
+
     for tr_no, tr_hash in tqdm(enumerate(hashes_to_fetch), total=len(hashes_to_fetch)):
-        for trial_no in range(5):
+        for trial_no in range(10):
+            if time.time() - last_save_stamp > 10 * 60:
+                src.utils.write_json(data, transactions_file)
+                last_save_stamp = time.time()
             time.sleep(0.3)  # just slow down a little bit
             try:
                 res_val = get_full_transaction(tr_hash)
                 break
             except RetryableException:
-                unfinished_count += 1
+                print('retry', trial_no)
                 time.sleep(2 ** trial_no)  # exponential cooldown
-        else:
-            raise Exception(f'Multiple timeouts')
 
         data[tr_hash] = res_val
 

@@ -68,7 +68,7 @@ class TrInfoDB:
                 tr_info = cand
                 break
         else:
-            raise Exception('Transaction not found')
+            raise Exception(f'Transaction row_id={row_id} not found')
 
         return {
             **tr_info,

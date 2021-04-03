@@ -25,13 +25,27 @@ def write_json(data, fpath):
         backup_file = fpath.with_name(f'{fpath.stem}.backup.json')
         fpath.rename(backup_file)
 
+    empty_cnt = 0
+    empty_entries_msg = ''
+    if type(data) is list:
+        for val in data:
+            if val is None:
+                empty_cnt += 1
+    elif type(data) is dict:
+        for val in data.values():
+            if val is None:
+                empty_cnt += 1
+    if empty_cnt > 0:
+        empty_entries_msg = f', {empty_cnt} empty entries'
+
     fpath.write_text('', 'utf-8') # we want to make file invalid JSON at this point
     with fpath.open('w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=None, separators=(',', ':'))
 
     if backup_file:
         backup_file.unlink()
-    print('written', fpath.stat().st_size, 'bytes', len(data), 'entries')
+
+    print('written', fpath.stat().st_size, 'bytes', len(data), 'entries' + empty_entries_msg)
 
 
 def iso_date_to_stamp(iso_date):

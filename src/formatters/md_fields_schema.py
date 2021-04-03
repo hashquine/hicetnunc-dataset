@@ -15,6 +15,8 @@ def db_fields_schema_to_md(schema):
         for row in section_rows:
             field_id = row['field']
             field_type = row['type']
+            if field_type.startswith('unsigned_'):
+                field_type = field_type.replace('unsigned_', '')
             field_example = row.get('example')
             field_descr = row['description']
 
