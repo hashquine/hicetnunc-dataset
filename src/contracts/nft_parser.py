@@ -1,6 +1,6 @@
 from collections import Counter
 
-import src.config
+import config
 import src.contracts.nft_state
 import src.contracts.state_utils
 
@@ -71,7 +71,7 @@ def parse_ops(ops):
             'ledger', 'metadata', 'operators',
             'paused', 'token_metadata',
         }
-        assert storage_value['administrator'] == src.config.name2addr['art_house_contract']
+        assert storage_value['administrator'] == config.name2addr['art_house_contract']
         assert int(storage_value['all_tokens']) >= 0
         assert storage_value['ledger'] == '511'
         assert storage_value['metadata'] == '512'
@@ -131,7 +131,7 @@ def parse_ops(ops):
             assert big_map_diff_set == diff_set
 
         elif call == 'mint':
-            assert op['sender'] == src.config.name2addr['art_house_contract']
+            assert op['sender'] == config.name2addr['art_house_contract']
             assert op['is_internal']
             assert op['entrypoint_id'] == 2
             assert params['branch'] == 'LRL'
@@ -162,7 +162,6 @@ def parse_ops(ops):
                 row_id=op_row_id,
                 token_id=int(value['token_id']),
                 count=int(value['amount']),
-                creator=op['creator'],
                 tokens_receiver=value['address'],
                 info_ipfs=value['token_info']['0@bytes'],
             )

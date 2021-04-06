@@ -1,4 +1,6 @@
-import src.config
+import config
+import src.ipfs
+import src.utils
 
 
 class IpfsNotCachedException(Exception):
@@ -20,7 +22,7 @@ def validate_ipfs_uri(uri):
 def get_ipfs_fpath(ipfs_uri, dir_name):
     ipfs_hash = validate_ipfs_uri(ipfs_uri)
     assert dir_name in ['ipfs0', 'ipfs1']
-    dir_path = src.config.cache_dir / dir_name
+    dir_path = config.cache_dir / dir_name
     assert dir_path.is_dir()
     fpath = dir_path / ipfs_hash
     if not fpath.is_file():
@@ -31,11 +33,11 @@ def get_ipfs_fpath(ipfs_uri, dir_name):
 def get_previews(ipfs):
     ipfs = src.ipfs.validate_ipfs_uri(ipfs)
     res = {}
-    original_fpath = src.config.ipfs1_dir / ipfs
+    original_fpath = config.ipfs1_dir / ipfs
     if original_fpath.exists():
         res['original'] = original_fpath
-    for preview_config_id, preview_config in src.config.previews_config.items():
-        dir_path = src.config.previews_dir / preview_config_id
+    for preview_config_id, preview_config in config.previews_config.items():
+        dir_path = config.previews_dir / preview_config_id
         fpath = dir_path / (ipfs + preview_config['extension'])
         if fpath.exists():
             file_size = fpath.stat().st_size
@@ -48,7 +50,7 @@ def make_media_db():
     import src.contracts.nft_state
     import src.contracts.state_utils
 
-    nft_state_log = src.utils.read_json(src.config.nft_state_log_file)
+    nft_state_log = src.utils.read_json(config.nft_state_log_file)
     nft_state = src.contracts.nft_state.NFTState()
     nft_state_replayer = src.contracts.state_utils.StateReplayer(nft_state_log, nft_state)
 

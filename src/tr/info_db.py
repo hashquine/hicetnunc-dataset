@@ -1,12 +1,12 @@
 import bisect
 
-import src.config
+import config
 import src.utils
 
 
 class TrInfoDB:
     def __init__(self):
-        self.db = src.utils.read_json(src.config.trs_info_file)
+        self.db = src.utils.read_json(config.trs_info_file)
         self.tr_by_hashc_cache = {}
         self.last_tr_chunk_read_cache = ('', None)
         self.make_index()
@@ -17,7 +17,7 @@ class TrInfoDB:
         self.hashc_to_db_idx = {}
 
         prev_max_row_id = 0
-        for db_idx, (tr_hashc, stamp, min_row_id, max_row_id, fname) in enumerate(self.db):
+        for db_idx, (tr_hashc, stamp, min_row_id, max_row_id, fname, tr_volume) in enumerate(self.db):
             assert min_row_id <= max_row_id
             assert prev_max_row_id < min_row_id
             prev_max_row_id = max_row_id
@@ -28,7 +28,7 @@ class TrInfoDB:
     def _read_trs_chunk_file(self, fname):
         cache_fname, cache_data = self.last_tr_chunk_read_cache
         if cache_fname != fname:
-            fpath = src.config.transactions_dir / fname
+            fpath = config.transactions_dir / fname
             assert fpath.is_file()
             self.last_tr_chunk_read_cache = (
                 fname,
@@ -39,7 +39,7 @@ class TrInfoDB:
         return cache_data
 
     def _get_info_by_db_idx(self, db_idx):
-        tr_hashc, stamp, min_row_id, max_row_id, fname = self.db[db_idx]
+        tr_hashc, stamp, min_row_id, max_row_id, fname, tr_volume = self.db[db_idx]
         return {
             'hash': tr_hashc.split('_')[0],
             'hashc': tr_hashc,
@@ -48,6 +48,7 @@ class TrInfoDB:
             'min_row_id': min_row_id,
             'max_row_id': max_row_id,
             'db_idx': db_idx,
+            'volume': tr_volume,
         }
 
     def get_tr_info_by_row_id(self, row_id):

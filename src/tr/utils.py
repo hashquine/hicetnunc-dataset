@@ -1,4 +1,4 @@
-import src.config
+import config
 
 
 def get_ops_volume(ops):
@@ -21,7 +21,7 @@ def get_tr_money_delta(tr):
 
 
 def get_addr_signature(addr):
-    return src.config.addr2name.get(addr, '*')
+    return config.addr2name.get(addr, '*')
 
 
 def get_op_signature(op):
@@ -47,11 +47,20 @@ def get_tr_signature(tr):
             continue
         if op['status'] == 'applied':
             has_any_applied = True
-        if op['sender'] not in src.config.addr2name and op.get('receiver') not in src.config.addr2name:
+        if op['sender'] not in config.addr2name and op.get('receiver') not in config.addr2name:
             ext_count += 1
         else:
             res += (get_op_signature(op),)
     if not has_any_applied:
         return tr['ops'][0]['status']
     res = (ext_count > 0,) + res
+    return res
+
+
+def get_ops_addrs(ops):
+    res = set()
+    for op in ops:
+        res.add(op['sender'])
+        if 'receiver' in op:
+            res.add(op['receiver'])
     return res

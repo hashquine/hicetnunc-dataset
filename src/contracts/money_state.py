@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 
-import src.config
+import config
 
 
 class MoneyState:
@@ -35,17 +35,23 @@ class MoneyState:
         self.balances[royalties_receiver] += royalties
         self.balances[payer] -= price
         self.balances[seller] += seller_income
-        self.balances[src.config.name2addr['comission_wallet']] += comission
+        self.balances[config.name2addr['comission_wallet']] += comission
+
+    def apply_ext_swap(
+            self, row_id, token_id, token_count,
+            sender, receiver, price, contract, call,
+    ):
+        pass
 
     def apply_comission_wallet_baking_percent(self, row_id, sender, volume):
-        assert sender == src.config.name2addr['baking_benjamins']
+        assert sender == config.name2addr['baking_benjamins']
         assert volume > 0
         self.comission_wallet['percent_income'] += volume
-        self.balances[src.config.name2addr['baking_benjamins']] -= volume
-        self.balances[src.config.name2addr['comission_wallet']] += volume
+        self.balances[config.name2addr['baking_benjamins']] -= volume
+        self.balances[config.name2addr['comission_wallet']] += volume
 
     def apply_comission_wallet_spending(self, row_id, receiver, volume):
         assert volume > 0
         self.comission_wallet['spending'] += volume
         self.balances[receiver] += volume
-        self.balances[src.config.name2addr['comission_wallet']] -= volume
+        self.balances[config.name2addr['comission_wallet']] -= volume

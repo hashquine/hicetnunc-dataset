@@ -26,8 +26,8 @@ class AddrsState:
         self.addrs[sender]['money_sent'] += volume
         self.addrs[sender]['out_calls'][call] += 1
         if receiver:
-            self.addrs[receiver]['in_op_count'] += 1
-            self.addrs[receiver]['money_received'] += 1
             self.check_first_addr_op(row_id, receiver)
+            self.addrs[receiver]['in_op_count'] += 1
+            self.addrs[receiver]['money_received'] += volume
         if call == '__reveal__':
             self.addrs[sender]['first_op_has_reveal'] = True

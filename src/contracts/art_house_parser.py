@@ -1,6 +1,6 @@
 from collections import Counter
 
-import src.config
+import config
 import src.contracts.art_house_state
 import src.contracts.state_utils
 
@@ -70,13 +70,13 @@ def parse_ops(ops):
             'curate', 'genesis', 'hdao', 'locked', 'manager', 'metadata', 'objkt',
             'objkt_id', 'royalties', 'size', 'swap_id', 'swaps',
         }
-        assert storage_value['curate'] == src.config.name2addr['curate_contract']
+        assert storage_value['curate'] == config.name2addr['curate_contract']
         assert storage_value['genesis'] == '2021-04-15T02:09:41Z'
-        assert storage_value['hdao'] == src.config.name2addr['hdao_contract']
+        assert storage_value['hdao'] == config.name2addr['hdao_contract']
         assert storage_value['locked'] == 'true'
-        assert storage_value['manager'] == src.config.name2addr['comission_wallet']
+        assert storage_value['manager'] == config.name2addr['comission_wallet']
         assert storage_value['metadata'] == '521'
-        assert storage_value['objkt'] == src.config.name2addr['nft_contract']
+        assert storage_value['objkt'] == config.name2addr['nft_contract']
         assert int(storage_value['objkt_id'])
         assert storage_value['royalties'] == '522'
         assert storage_value['size'] == '0'
@@ -135,12 +135,16 @@ def parse_ops(ops):
             assert op['volume'] == 0
 
             swap_id = ah_state.next_swap_id
-            ah_state.apply_swap(
-                row_id=op_row_id,
-                count=int(value['objkt_amount']),
-                token_id=int(value['objkt_id']),
-                price=int(value['xtz_per_objkt']),
-            )
+            try:
+                ah_state.apply_swap(
+                    row_id=op_row_id,
+                    swap_sender=op['sender'],
+                    count=int(value['objkt_amount']),
+                    token_id=int(value['objkt_id']),
+                    price=int(value['xtz_per_objkt']),
+                )
+            except Exception:
+                print(op)
 
             assert len(big_map_diff) == 1
             assert swap_id == int(big_map_diff[0]['key'])
@@ -163,6 +167,7 @@ def parse_ops(ops):
             objkt_id = ah_state.next_token_id
             ah_state.apply_mint(
                 row_id=op_row_id,
+                mint_sender=op['sender'],
                 tokens_receiver=value['address'],
                 count=int(value['amount']),
                 info_ipfs=value['metadata'],

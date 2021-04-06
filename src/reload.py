@@ -18,7 +18,7 @@ def _reload():
 
     import src
     import src.utils
-    import src.config
+    import config
     import src.ipfs
     import src.datasets
     import src.formatters.md_fields_schema
@@ -35,7 +35,7 @@ def _reload():
     import src.contracts.addrs_state
 
     importlib.reload(src.utils)
-    importlib.reload(src.config)
+    importlib.reload(config)
     importlib.reload(src.ipfs)
     importlib.reload(src.datasets)
     importlib.reload(src.formatters.md_fields_schema)

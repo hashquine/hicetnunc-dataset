@@ -1,5 +1,5 @@
 import src.utils
-import src.config
+import config
 
 
 class NFTState:
@@ -10,11 +10,10 @@ class NFTState:
         self.tokens = {}
         self.next_token_id = 152
 
-    def apply_mint(self, row_id, token_id, count, creator, tokens_receiver, info_ipfs):
+    def apply_mint(self, row_id, token_id, count, tokens_receiver, info_ipfs):
         assert token_id == self.next_token_id
         assert token_id not in self.tokens
         self.tokens[token_id] = {
-            'creator': creator,
             'tokens_receiver': tokens_receiver,
             'mint_count': count,
             'info_ipfs': info_ipfs,

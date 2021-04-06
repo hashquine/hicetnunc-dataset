@@ -2,7 +2,7 @@ import csv
 from collections import defaultdict
 
 import src.utils
-import src.config
+import config
 
 
 class FieldsGroup:
@@ -13,6 +13,9 @@ class FieldsGroup:
 class TrEvent(FieldsGroup):
     def __init__(self, row_id=-1):
         self.row_id = row_id
+
+    def __repr__(self):
+        return f'TrEvent({self.row_id})'
 
     def set_row_id(self, row_id):
         self.row_id = row_id
@@ -39,11 +42,23 @@ class FloatSet(FieldsGroup):
         self.zero_count = 0
         self.values = values or []
 
-    def add(self, v):
-        if v == 0:
-            self.zero_count += 1
-        else:
-            self.values.append(v)
+    def __repr__(self):
+        return f'FloatSet(0x{self.zero_count} + {len(self.values)})'
+
+    def add(self, v, count=1):
+        for i in range(count):
+            if v == 0:
+                self.zero_count += 1
+            else:
+                self.values.append(v)
+
+    def count(self, mode='all'):
+        if mode == 'all':
+            return len(self.values) + self.zero_count
+        elif mode == 'zero':
+            return self.zero_count
+        elif mode == 'non_zero':
+            return len(self.values)
 
     def expand_fields(self, prefix, tr_info_db):
         prefix1 = '_'.join(prefix.split('_')[:-1])
@@ -51,6 +66,7 @@ class FloatSet(FieldsGroup):
         if len(self.values) == 0:
             return {
                 f'{prefix1}_count': 0,
+                f'{prefix1}_nonzero_count': self.zero_count,
                 f'{prefix1}_zero_count': self.zero_count,
                 f'{prefix2}_min': 0,
                 f'{prefix2}_max': 0,
@@ -59,7 +75,8 @@ class FloatSet(FieldsGroup):
             }
         else:
             return {
-                f'{prefix1}_count': len(self.values),
+                f'{prefix1}_count': len(self.values) + self.zero_count,
+                f'{prefix1}_nonzero_count': len(self.values),
                 f'{prefix1}_zero_count': self.zero_count,
                 f'{prefix2}_min': min(self.values),
                 f'{prefix2}_max': max(self.values),
@@ -110,7 +127,7 @@ def validate_type(row, field_id, field_type, checked_fields, is_csv=False):
         assert type(field_val) is str
 
     elif field_type == 'unsigned_string':
-        assert type(field_val) is str
+        assert type(field_val) is str, field_id
         if field_val != '':
             assert int(field_val) >= 0
 
@@ -122,13 +139,13 @@ def validate_type(row, field_id, field_type, checked_fields, is_csv=False):
     elif field_type == 'unsigned_integer':
         if not csv:
             assert type(field_val) is int
-        assert float(field_val) % 1 == 0
-        assert float(field_val) >= 0 or float(field_val) == -1
+        assert float(field_val) % 1 == 0, field_id
+        assert float(field_val) >= 0 or float(field_val) == -1, field_id
 
     elif field_type == 'unsigned_float':
         if not csv:
-            assert type(field_val) in [int, float]
-        assert float(field_val) >= 0 or float(field_val) == -1
+            assert type(field_val) in [int, float], field_id
+        assert float(field_val) >= 0 or float(field_val) == -1, field_id
 
     elif field_type == 'iso_date':
         assert type(field_val) is str
@@ -203,6 +220,13 @@ def validate_field(row, field_schema, checked_fields, is_csv=False):
         )
         validate_type(
             row,
+            prefix1 + '_nonzero_count',
+            'unsigned_integer',
+            checked_fields,
+            is_csv,
+        )
+        validate_type(
+            row,
             prefix1 + '_zero_count',
             'unsigned_integer',
             checked_fields,
@@ -211,28 +235,28 @@ def validate_field(row, field_schema, checked_fields, is_csv=False):
         validate_type(
             row,
             field_id + '_min',
-            'unsigned_integer',
+            'unsigned_float',
             checked_fields,
             is_csv,
         )
         validate_type(
             row,
             field_id + '_max',
-            'unsigned_integer',
+            'unsigned_float',
             checked_fields,
             is_csv,
         )
         validate_type(
             row,
             field_id + '_sum',
-            'unsigned_integer',
+            'unsigned_float',
             checked_fields,
             is_csv,
         )
         validate_type(
             row,
             field_id + '_avg',
-            'unsigned_integer',
+            'unsigned_float',
             checked_fields,
             is_csv,
         )
@@ -277,18 +301,18 @@ def validate_rows(rows, dataset_fields, is_csv=False):
 
 
 def validate_datasets():
-    datasets_fields = src.utils.read_json(src.config.datasets_fields_file)
+    datasets_fields = src.utils.read_json(config.datasets_fields_file)
 
     for dataset_id, dataset_fields in datasets_fields.items():
         print('Validating', dataset_id, '...')
-        dataset_csv_file = src.config.dataset_dir / (dataset_id + '.csv')
+        dataset_csv_file = config.dataset_dir / (dataset_id + '.csv')
         with dataset_csv_file.open('r', newline='', encoding='utf-8') as f:
             validate_rows([
                 row
                 for row in csv.DictReader(f)
             ], dataset_fields)
 
-        dataset_json = src.utils.read_json(src.config.dataset_dir / (dataset_id + '.json'))
+        dataset_json = src.utils.read_json(config.dataset_dir / (dataset_id + '.json'))
         validate_rows([
             row
             for row in dataset_json.values()

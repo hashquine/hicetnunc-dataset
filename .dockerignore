@@ -1,0 +1,5 @@
+/.idea
+/cache*
+/export_cache
+/console.txt
+.ipynb_checkpoints

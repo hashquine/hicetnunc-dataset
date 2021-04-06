@@ -58,6 +58,7 @@ def db_fields_schema_to_md(schema):
                 field_id_stem = '_'.join(field_id.split('_')[:-1])
                 field_id = '</code><br><code>'.join([
                     f'{field_id_stem}_count',
+                    f'{field_id_stem}_nonzero_count',
                     f'{field_id_stem}_zero_count',
                     f'{field_id}_min',
                     f'{field_id}_max',

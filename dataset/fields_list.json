@@ -8,9 +8,9 @@
                 "description": "Token identifier: numeric strings with OBJKT ids from <code>https://www.hicetnunc.xyz/objkt/{token_id}</code>."
             },
             {
-                "field": "creator",
+                "field": "issuer",
                 "type": "address",
-                "description": "Address of the token minter."
+                "description": "Address of the person, who intiated mint transaction and receives royalties. It is also referred to as token author in this dataset."
             },
             {
                 "field": "mint_count",
@@ -41,6 +41,18 @@
                 "description": "File size of <code>artifact_ipfs</code> in bytes."
             },
             {
+                "field": "artifact_preview_width",
+                "type": "unsigned_integer",
+                "example": 1024,
+                "description": "Preview image width of <code>artifact_ipfs</code> in pixels. Not more, than 1024."
+            },
+            {
+                "field": "artifact_preview_height",
+                "type": "unsigned_integer",
+                "example": 781,
+                "description": "Preview image height of <code>artifact_ipfs</code> in pixels. Not more, than 1024."
+            },
+            {
                 "field": "info_title",
                 "type": "string",
                 "example": "Dali tower",
@@ -55,8 +67,14 @@
             {
                 "field": "info_tags",
                 "type": "string",
-                "example": "tag1    tag2",
-                "description": "List of the NFT tags specified by creator delimited with tab character."
+                "example": "tag1 tag2",
+                "description": "List of the NFT tags specified by creator delimited with space character."
+            },
+            {
+                "field": "ban_status",
+                "type": "string",
+                "example": "banned",
+                "description": "If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from https://github.com/hicetnunc2000/hicetnunc/tree/main/filters"
             }
         ],
         "statistics": [
@@ -97,7 +115,7 @@
                 "field": "author_sent_count",
                 "type": "unsigned_integer",
                 "example": 5,
-                "description": "How much instances were directly transferred by author to users without swaps."
+                "description": "How much instances were directly transferred by author to users without official swaps."
             }
         ],
         "auxiliary": [
@@ -120,7 +138,12 @@
             {
                 "field": "info_creator",
                 "type": "address",
-                "description": "Address of the token creator as specified in token meta JSON file. In 99.99% the same as <code>creator</code> field, but sometimes empty probably due to some bug."
+                "description": "Address of the token creator as specified in token meta JSON file. In 99.99% the same as <code>issuer</code> field, but sometimes empty probably due to some bug."
+            },
+            {
+                "field": "mint_tokens_receiver",
+                "type": "address",
+                "description": "Address of the user, who received tokens after mint transaction. In 99% the same as <code>issuer</code> field."
             },
             {
                 "field": "mint_ah_row_id",
@@ -206,9 +229,21 @@
                 "type": "string",
                 "example": "user/mathmakesart",
                 "description": "User Reddit account according to <a href=\"https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified\">tzkt.io metadata</a>."
+            },
+            {
+                "field": "ban_status",
+                "type": "string",
+                "example": "banned",
+                "description": "If empty - author is ok, <code>banned</code> - user is banned, <code>some_tokens_banned</code> - user is not banned, but it minted banned tokens. Ban status is taken from https://github.com/hicetnunc2000/hicetnunc/tree/main/filters"
             }
         ],
         "statistics": [
+            {
+                "field": "mint_count",
+                "type": "unsigned_integer",
+                "example": 125,
+                "description": "Number of minted works."
+            },
             {
                 "field": "bought_prices",
                 "type": "float_set",
@@ -252,13 +287,6 @@
                 "type": "unsigned_float",
                 "example": 10,
                 "description": "Total volume of XTZ sent by address in transactions related to hicetnunc"
-            }
-        ],
-        "auxiliary": [
-            {
-                "field": "first_op_has_reveal",
-                "type": "boolean",
-                "description": "Whether first interaction with hicetnunc was the first transaction in Tezos for user"
             }
         ]
     },
@@ -305,10 +333,10 @@
                 "description": "Numeric string with swap identifier."
             },
             {
-                "field": "is_secondary",
+                "field": "by_author",
                 "type": "boolean",
                 "example": 1,
-                "description": "If 1 - swap was created by other user, so it is the secondary market."
+                "description": "If 1 - swap was created by author, if 0 - by other user."
             }
         ],
         "statistics": [
@@ -342,8 +370,8 @@
             {
                 "field": "category",
                 "type": "string",
-                "example": "author-&gt;swap</code><br><code>swap-&gt;author</code><br><code>swap-&gt;user</code><br><code>user-&gt;user</code><br><code>author-&gt;trash</code><br><code>user-&gt;trash</code><br><code>user-&gt;swap",
-                "description": "String, which characterizes transfer in following terms: <code>author</code>, <code>swap</code>, <code>user</code>, <code>trash</code>. <br>This division is a convention used in this repository only."
+                "example": "mint-&gt;author</code><br><code>author-&gt;swap</code><br><code>swap-&gt;author</code><br><code>swap-&gt;user</code><br><code>user-&gt;user</code><br><code>author-&gt;burn</code><br><code>user-&gt;burn</code><br><code>user-&gt;ext</code><br>...",
+                "description": "String, which characterizes transfer in following terms: <code>author</code>, <code>swap</code>, <code>user</code>, <code>burn</code>, <code>ext</code>. <br>This division is a convention used in this repository only."
             },
             {
                 "field": "token_id",
@@ -355,7 +383,7 @@
                 "field": "price",
                 "type": "unsigned_float",
                 "example": 1.5,
-                "description": "Price per item in XTZ or 0 for direct transfers."
+                "description": "Price per item in XTZ or 0 for direct transfers. For external swaps price is guessed heuristically as half of sum of abolute values of transaction money transers (since each money transaction is counted twice both as incoming and outcoming)."
             },
             {
                 "field": "count",
@@ -379,6 +407,12 @@
                 "type": "address",
                 "example": "tz1MwvWa...",
                 "description": "Receiver address"
+            },
+            {
+                "field": "method",
+                "type": "string",
+                "example": "mint_OBJKT",
+                "description": "Called method of hicetnunc or external contract, otherwise empty string"
             }
         ]
     },
@@ -419,10 +453,10 @@
                 "description": "When swap was closed (cancelled). If closed, swap cannot be reopened again."
             },
             {
-                "field": "is_secondary",
+                "field": "by_author",
                 "type": "boolean",
                 "example": 1,
-                "description": "If 1 - swap was created by other user, so it is the secondary market."
+                "description": "If 1 - swap was created by author, if 0 - by other user."
             },
             {
                 "field": "created_by",

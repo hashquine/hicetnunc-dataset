@@ -1,0 +1,4 @@
+tqdm===4.46.1
+requests===2.18.4
+python-dateutil===2.7.3
+Pillow===8.2.0
