@@ -1,5 +1,7 @@
 /.idea
-/cache*
+/cache
+/cache1
 /export_cache
 /console.txt
+/dataset.zip
 .ipynb_checkpoints

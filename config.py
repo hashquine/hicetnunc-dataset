@@ -10,6 +10,7 @@ assert repo_dir.name == 'hicetnunc-dataset'
 cache_dir = repo_dir / 'cache'
 export_cache_dir = repo_dir / 'export_cache'
 export_cache_archive_file = repo_dir / 'cache.zip'
+export_dataset_archive_file = repo_dir / 'dataset.zip'
 
 if not (cache_dir / 'ipfs0').exists():
     if export_cache_archive_file.exists():

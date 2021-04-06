@@ -2,5 +2,7 @@
 /cache*
 /export_cache
 /cache.zip
+/dataset.zip
 /console.txt
 .ipynb_checkpoints
+*.hide

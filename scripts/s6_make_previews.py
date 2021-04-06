@@ -61,6 +61,7 @@ if __name__ == '__main__':
 
         print(preview_config_id, '...')
         dir_path = config.previews_dir / preview_config_id
+        dir_path.mkdir(exist_ok=True)
 
         for media_db_entry in tqdm(list(media_db.values())):
             ipfs = media_db_entry['ipfs']
