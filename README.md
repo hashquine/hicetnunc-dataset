@@ -73,7 +73,7 @@ author_sent_count <= other_own_count + available_count + available_zero_count</p
 </tr><tr>    <td><code>token_id</code></td>
     <td><code>string</code></td>
     <td><code>"152"</code></td>
-    <td>Token identifier: numeric strings with OBJKT ids from <code>https://www.hicetnunc.xyz/objkt/{token_id}</code>.</td>
+    <td>Token identifier: numeric strings with OBJKT ids from <code>hicetnunc.xyz/objkt</code> url.</td>
 </tr><tr>
     <td><code>issuer</code></td>
     <td><code>string</code></td>

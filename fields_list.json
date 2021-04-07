@@ -5,7 +5,7 @@
                 "field": "token_id",
                 "type": "unsigned_string",
                 "example": "152",
-                "description": "Token identifier: numeric strings with OBJKT ids from <code>https://www.hicetnunc.xyz/objkt/{token_id}</code>."
+                "description": "Token identifier: numeric strings with OBJKT ids from <code>hicetnunc.xyz/objkt</code> url."
             },
             {
                 "field": "issuer",
