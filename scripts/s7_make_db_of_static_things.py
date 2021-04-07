@@ -129,7 +129,6 @@ if __name__ == '__main__':
                 assert src.ipfs.validate_ipfs_uri(token_info['displayUri'])
 
         assert token_info['decimals'] == 0
-        assert token_info['thumbnailUri'] == 'ipfs://QmNrhZHUaEqxhyLfqoq1mtHSipkWHeT31LNHb1QEbDHgnc'
         assert token_info['symbol'] == 'OBJKT'
 
         assert len(token_info['formats']) == 1
@@ -143,6 +142,9 @@ if __name__ == '__main__':
 
         if token_info['creators'][0] != token_db_entry['mint_sender']:
             assert token_id == '5571' or token_info['creators'][0] in ['', None]
+
+        if token_info['thumbnailUri'] != 'ipfs://QmNrhZHUaEqxhyLfqoq1mtHSipkWHeT31LNHb1QEbDHgnc':
+            token_db_entry['thumbnail_ipfs'] = src.ipfs.validate_ipfs_uri(token_info['thumbnailUri'])
 
         token_db_entry['artifact_mime'] = token_info['formats'][0]['mimeType']
         token_db_entry['artifact_ipfs'] = token_info['formats'][0]['uri']

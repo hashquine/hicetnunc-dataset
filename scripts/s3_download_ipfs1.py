@@ -8,10 +8,10 @@ if str(repo_dir) not in sys.path:
 import config
 from tqdm import tqdm
 
-import scripts.s2_download_ipfs0
+import s2_download_ipfs0
 
 
 if __name__ == '__main__':
 
-    for ref in tqdm(scripts.s2_download_ipfs0.get_refs1_to_fetch()):
-        scripts.s2_download_ipfs0.fetch_ipfs_ref(ref, config.ipfs1_dir)
+    for ref in tqdm(s2_download_ipfs0.get_refs1_to_fetch()):
+        s2_download_ipfs0.fetch_ipfs_ref(ref, config.ipfs1_dir)

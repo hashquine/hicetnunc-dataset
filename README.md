@@ -1,10 +1,12 @@
 # hicetnunc.xyz open dataset and parsers
 
+<a href="https://hub.docker.com/repository/docker/pallada92/hicetnunc-dataset"><img src="https://img.shields.io/badge/docker%20hub-pallada92%2Fhicetnunc--dataset-blue" /></a> <img src="https://img.shields.io/badge/python-3.6-yellow"/> <a href="https://creativecommons.org/licenses/by/4.0/"><img src="https://img.shields.io/badge/license-CC%20BY-green" /></a>
+
 [Hic et nunc](http://hicetnunc.xyz) is a new eco-friendly [NFT](https://en.wikipedia.org/wiki/Non-fungible_token) marketplace, built on top of [Tezos](https://en.wikipedia.org/wiki/Tezos) blockchain.
 
 It is especially popular in generative graphics and data viz community, so I've decided to share data and all scripts that I've made for https://hashquine.github.io/hicetnunc rating.
 
-It is published under [CC BY](https://creativecommons.org/licenses/by/2.0/) license, so that it is even possible to sell NFTs that use that data (or modified scripts) as long as there is the following phrase somewhere in the token description: `based on @hashquine dataset`.
+It is published under [CC BY](https://creativecommons.org/licenses/by/4.0/) license, so that it is even possible to sell NFTs that use that data (or modified scripts) as long as there is the following phrase somewhere in the token description: `based on @hashquine dataset`.
 
 Since hicetnunc servers are already under an extreme load due to quick growth, I've reorganized code, so that all data is taken from Tezos blockchain and IPFS **without any calls** to the [hicetnunc.xyz](http://hicetnunc.xyz) website or API. 
 
@@ -125,13 +127,13 @@ author_sent_count <= other_own_count + available_count + available_zero_count</p
 </tr><tr>
     <td><code>info_tags</code></td>
     <td><code>string</code></td>
-    <td><code>"tag1    tag2"</code></td>
-    <td>List of the NFT tags specified by creator delimited with tab character.</td>
+    <td><code>"tag1 tag2"</code></td>
+    <td>List of the NFT tags specified by creator delimited with space character.</td>
 </tr><tr>
     <td><code>ban_status</code></td>
     <td><code>string</code></td>
     <td><code>"banned"</code></td>
-    <td>If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from https://github.com/hicetnunc2000/hicetnunc/tree/main/filters</td>
+    <td>If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from [hicetnunc repository](https://github.com/hicetnunc2000/hicetnunc/tree/main/filters)</td>
 </tr><tr>
     <td colspan="4" align="center"><b>Statistics fields</b></td>
 </tr><tr>
@@ -379,6 +381,11 @@ There is the following invariant:
     <td><code>boolean</code></td>
     <td><code>1</code> <code>0</code></td>
     <td>If 1 - swap was created by author, if 0 - by other user.</td>
+</tr><tr>
+    <td><code>author</code></td>
+    <td><code>string</code></td>
+    <td><code>"tz1UBZUk..."</code></td>
+    <td>Address of token issuer, which receives royalties.</td>
 </tr><tr>
     <td colspan="4" align="center"><b>Statistics fields</b></td>
 </tr><tr>

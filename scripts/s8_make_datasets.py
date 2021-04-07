@@ -418,6 +418,7 @@ for nft_log_entry in nft_state_log:
                 'buyer': tx_to,
                 'price': price,
                 'swap_id': swap_ds_entry['swap_id'],
+                'author': token_ds_entry['issuer'],
                 'by_author': by_author,
                 'total_royalties': money_log_entry['royalties'],
                 'total_comission': money_log_entry['comission'],

@@ -49,7 +49,7 @@ tzktio_accounts_logos_dir.mkdir(exist_ok=True)
 
 dataset_dir = repo_dir / 'dataset'
 dataset_dir.mkdir(exist_ok=True)
-datasets_fields_file = dataset_dir / 'fields_list.json'
+datasets_fields_file = repo_dir / 'fields_list.json'
 datasets_fields_file.parent.mkdir(exist_ok=True)
 
 name2addr = {
