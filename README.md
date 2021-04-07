@@ -1,6 +1,6 @@
 # hicetnunc.xyz open dataset and parsers
 
-<a href="https://hub.docker.com/repository/docker/pallada92/hicetnunc-dataset"><img src="https://img.shields.io/badge/docker%20hub-pallada92%2Fhicetnunc--dataset-blue" /></a> <img src="https://img.shields.io/badge/python-3.6-yellow"/> <a href="https://creativecommons.org/licenses/by/4.0/"><img src="https://img.shields.io/badge/license-CC%20BY-green" /></a>
+<a href="https://creativecommons.org/licenses/by/4.0/"><img src="https://img.shields.io/badge/license-CC%20BY-green" /></a> <img src="https://img.shields.io/badge/python-3.6-yellow"/> <a href="https://hub.docker.com/repository/docker/pallada92/hicetnunc-dataset"><img src="https://img.shields.io/badge/docker%20hub-pallada92%2Fhicetnunc--dataset-blue" /></a>
 
 [Hic et nunc](http://hicetnunc.xyz) is a new eco-friendly [NFT](https://en.wikipedia.org/wiki/Non-fungible_token) marketplace, built on top of [Tezos](https://en.wikipedia.org/wiki/Tezos) blockchain.
 
@@ -133,7 +133,7 @@ author_sent_count <= other_own_count + available_count + available_zero_count</p
     <td><code>ban_status</code></td>
     <td><code>string</code></td>
     <td><code>"banned"</code></td>
-    <td>If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from [hicetnunc repository](https://github.com/hicetnunc2000/hicetnunc/tree/main/filters)</td>
+    <td>If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from <a href="https://github.com/hicetnunc2000/hicetnunc/tree/main/filters" target="_blank">hicetnunc repository</a></td>
 </tr><tr>
     <td colspan="4" align="center"><b>Statistics fields</b></td>
 </tr><tr>
@@ -257,7 +257,7 @@ All users, who ever created or owned NFT token.
     <td><code>tzkt_info_logo</code></td>
     <td><code>string</code></td>
     <td><code>"huson.png"</code></td>
-    <td>User logo according to <a href="https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/{logo}</code> to get the full url</td>
+    <td>User logo according to <a href="https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/</code> to get the full url</td>
 </tr><tr>
     <td><code>tzkt_info_github</code></td>
     <td><code>string</code></td>
@@ -282,7 +282,7 @@ All users, who ever created or owned NFT token.
     <td><code>ban_status</code></td>
     <td><code>string</code></td>
     <td><code>"banned"</code></td>
-    <td>If empty - author is ok, <code>banned</code> - user is banned, <code>some_tokens_banned</code> - user is not banned, but it minted banned tokens. Ban status is taken from https://github.com/hicetnunc2000/hicetnunc/tree/main/filters</td>
+    <td>If empty - author is ok, <code>banned</code> - user is banned, <code>some_tokens_banned</code> - user is not banned, but it minted banned tokens. Ban status is taken from <a href="https://github.com/hicetnunc2000/hicetnunc/tree/main/filters" target="_blank">hicetnunc repository</a></td>
 </tr><tr>
     <td colspan="4" align="center"><b>Statistics fields</b></td>
 </tr><tr>

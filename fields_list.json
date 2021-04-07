@@ -74,7 +74,7 @@
                 "field": "ban_status",
                 "type": "string",
                 "example": "banned",
-                "description": "If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from [hicetnunc repository](https://github.com/hicetnunc2000/hicetnunc/tree/main/filters)"
+                "description": "If empty - token is ok, <code>banned</code> - token is banned, <code>author_banned</code> - token author is banned. Ban status is taken from <a href=\"https://github.com/hicetnunc2000/hicetnunc/tree/main/filters\" target=\"_blank\">hicetnunc repository</a>"
             }
         ],
         "statistics": [
@@ -204,7 +204,7 @@
                 "field": "tzkt_info_logo",
                 "type": "string",
                 "example": "huson.png",
-                "description": "User logo according to <a href=\"https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified\">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/{logo}</code> to get the full url"
+                "description": "User logo according to <a href=\"https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified\">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/</code> to get the full url"
             },
             {
                 "field": "tzkt_info_github",
@@ -234,7 +234,7 @@
                 "field": "ban_status",
                 "type": "string",
                 "example": "banned",
-                "description": "If empty - author is ok, <code>banned</code> - user is banned, <code>some_tokens_banned</code> - user is not banned, but it minted banned tokens. Ban status is taken from https://github.com/hicetnunc2000/hicetnunc/tree/main/filters"
+                "description": "If empty - author is ok, <code>banned</code> - user is banned, <code>some_tokens_banned</code> - user is not banned, but it minted banned tokens. Ban status is taken from <a href=\"https://github.com/hicetnunc2000/hicetnunc/tree/main/filters\" target=\"_blank\">hicetnunc repository</a>"
             }
         ],
         "statistics": [
