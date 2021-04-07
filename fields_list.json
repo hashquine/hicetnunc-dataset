@@ -204,7 +204,7 @@
                 "field": "tzkt_info_logo",
                 "type": "string",
                 "example": "huson.png",
-                "description": "User logo according to <a href=\"https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified\">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/</code> to get the full url"
+                "description": "User logo according to <a href=\"https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified\">tzkt.io metadata</a>. Add prefix <code>services.tzkt.io/v1/avatars2/</code> to get the full url"
             },
             {
                 "field": "tzkt_info_github",
