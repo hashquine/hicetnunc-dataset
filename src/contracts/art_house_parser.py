@@ -37,7 +37,8 @@ def parse_ops(ops):
                 assert error['id'] in [
                     'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
                     'proto.008-PtEdo2Zk.michelson_v1.script_rejected',
-                ]
+                    'proto.008-PtEdo2Zk.contract.balance_too_low',
+                ], error['id']
                 # if error['id'] == 'proto.008-PtEdo2Zk.michelson_v1.script_rejected':
                 #     print(op_hash, op['parameters'])
                 errors_counter[error['id']] += 1
@@ -95,7 +96,7 @@ def parse_ops(ops):
             assert set(value.keys()) == { 'hDAO_amount', 'objkt_id' }
             assert int(value['hDAO_amount']) >= 0
             assert int(value['objkt_id'])
-            assert op['volume'] == 0
+            # assert op['volume'] == 0
             assert 'big_map_diff' not in op
             continue
 
