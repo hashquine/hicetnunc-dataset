@@ -445,7 +445,8 @@ for nft_log_entry in nft_state_log:
             assert sender_category in ['author', 'user', 'ext'], sender_category
 
             if receiver_category == 'swap':
-                assert tr_volume == 0
+                if tr_volume > 0:
+                    print('Swap with non-zero volume ' + tr_info['hash'])
 
                 if not ah_log_entry:
                     # If token is sent to the Art House without calling contract
@@ -454,7 +455,8 @@ for nft_log_entry in nft_state_log:
 
                 else:
                     assert ah_log_entry['method'] == 'apply_swap'
-                    assert tr_volume == 0
+                    if tr_volume > 0:
+                        print('apply_swap with non-zero volume ' + tr_info['hash'])
 
                     swap_id = str(created_swap_db_entry['swap_id'])
 

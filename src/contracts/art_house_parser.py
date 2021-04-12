@@ -133,7 +133,8 @@ def parse_ops(ops):
             assert int(value['objkt_amount'])
             assert int(value['objkt_id'])
             assert int(value['xtz_per_objkt']) >= 0
-            assert op['volume'] == 0
+            if op['volume'] != 0:
+                print(f'Non-zero volume of swap op {op_hash}')
 
             swap_id = ah_state.next_swap_id
             try:

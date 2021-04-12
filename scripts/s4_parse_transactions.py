@@ -27,7 +27,11 @@ addrs_state = src.contracts.state_utils.StateRecorder(addrs_state)
 
 print('Filtering NFT, ArtHouse and money ops...')
 
+tr_count = 0
+
 for tr in src.tr.iter.iter_tr():
+    tr_count +=1
+
     if tr['time'] >= max_time:
         continue
 
@@ -73,8 +77,7 @@ for tr in src.tr.iter.iter_tr():
     if tr_volume > 0:
         money_trs.append(tr)
 
-
-print('Writing addrs log...')
+print(f'Writing addrs log... tr_count={tr_count}')
 
 src.utils.write_json(addrs_state.log, config.addrs_state_log_file)
 

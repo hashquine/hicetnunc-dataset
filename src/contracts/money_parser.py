@@ -78,6 +78,19 @@ def parse_trs(trs):
 
                 # ootfvp2R3rkqduMZsYtT4zcxa7v8aZhH1ZCtGtf5E3taZXWW9ge
                 ('KT1XJZfADhJkFJVXU75bmAzDAMwxTYvSW1QJ', 'divestLiquidity'),
+
+                ('KT1LpvCL8ooYqMX4pnjSjZKaghBPReQPX8br', 'tezToTokenPayment'),
+                ('KT1LpvCL8ooYqMX4pnjSjZKaghBPReQPX8br', 'tokenToTezPayment'),
+                ('KT1LpvCL8ooYqMX4pnjSjZKaghBPReQPX8br', 'investLiquidity'),
+                ('KT1LpvCL8ooYqMX4pnjSjZKaghBPReQPX8br', 'divestLiquidity'),
+
+                ('KT1DCegbuJXoF1eEwX7stzEb6vBVahcPVzQY', 'tezToTokenPayment'),
+                ('KT1DCegbuJXoF1eEwX7stzEb6vBVahcPVzQY', 'tokenToTezPayment'),
+                ('KT1DCegbuJXoF1eEwX7stzEb6vBVahcPVzQY', 'investLiquidity'),
+                ('KT1DCegbuJXoF1eEwX7stzEb6vBVahcPVzQY', 'divestLiquidity'),
+
+                # ??? ooyRrqQbj1zQGfWqG37nzBqzemubPwyeLgmoE8tn4PVVLZn1mq5
+                ('KT1Hkg5qeNhfwpKW4fXvq7HGZB9z2EnmCCA9', 'swap'),
             ]:
                 ext_swaps_examples[(first_contract, first_call)] = tr['hash']
 
