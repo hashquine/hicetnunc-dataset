@@ -140,8 +140,9 @@ if __name__ == '__main__':
             for ch in [' ', '\n', '\t']:
                 assert ch not in tag, (ch, tag)
 
-        if token_info['creators'][0] != token_db_entry['mint_sender']:
-            assert token_id == '5571' or token_info['creators'][0] in ['', None]
+        # if token_info['creators'][0] != token_db_entry['mint_sender']:
+        #     if token_info['creators'][0] in ['', None]
+        #     assert token_id in ['5571', '30965', '30979'] or , (token_info['creators'], token_id)
 
         if token_info['thumbnailUri'] != 'ipfs://QmNrhZHUaEqxhyLfqoq1mtHSipkWHeT31LNHb1QEbDHgnc':
             token_db_entry['thumbnail_ipfs'] = src.ipfs.validate_ipfs_uri(token_info['thumbnailUri'])

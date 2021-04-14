@@ -121,7 +121,8 @@ def parse_trs(trs):
 
             # pay royalties
             assert 'parameters' not in tr_ops[1]
-            assert tr_ops[1]['volume'] > 0
+            if tr_ops[1]['volume'] == 0:
+                print('Zero royalties', tr['hash'])
             royalties_receiver = tr_ops[1]['receiver']
             royalties = tr_ops[1]['volume']
 
