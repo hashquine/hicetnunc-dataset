@@ -106,7 +106,7 @@ def parse_trs(trs):
             if (first_contract, first_call) != (config.name2addr['art_house_contract'], 'collect'):
                 raise Exception(f'Unexpected method {first_call} of external contract {first_contract}')
 
-            assert len(tr_ops) == 6
+            assert len(tr_ops) in [5, 6], tr['hash']
 
             # when the first transfer between users (with non-zero XTZ volume) will happen,
             # this assert will fail
@@ -138,15 +138,16 @@ def parse_trs(trs):
             seller = tr_ops[3]['receiver']
             seller_income = tr_ops[3]['volume']
 
-            # give hDAO tokens
-            assert tr_ops[4]['receiver'] == config.name2addr['hdao_contract']
-            assert tr_ops[4]['parameters']['call'] == 'hDAO_batch'
-            assert tr_ops[4]['volume'] == 0
+            if len(tr_ops) == 6:
+                # give hDAO tokens
+                assert tr_ops[4]['receiver'] == config.name2addr['hdao_contract']
+                assert tr_ops[4]['parameters']['call'] == 'hDAO_batch'
+                assert tr_ops[4]['volume'] == 0
 
             # transfer NFT
-            assert tr_ops[5]['parameters']['call'] == 'transfer'
-            assert tr_ops[5]['receiver'] == config.name2addr['nft_contract']
-            assert tr_ops[5]['volume'] == 0
+            assert tr_ops[-1]['parameters']['call'] == 'transfer'
+            assert tr_ops[-1]['receiver'] == config.name2addr['nft_contract']
+            assert tr_ops[-1]['volume'] == 0
 
             money_state.apply_swap_sell(
                 row_id=last_nft_op['row_id'],

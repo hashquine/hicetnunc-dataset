@@ -106,10 +106,20 @@ if __name__ == '__main__':
         for field in token_info:
             token_info_fields_cnt[field] += 1
         token_info_keys = set(token_info.keys())
-        assert token_info_keys.issubset({
+
+        if not token_info_keys.issubset({
             'artifactUri', 'creators', 'decimals', 'description', 'displayUri', 'formats',
             'isBooleanAmount', 'name', 'shouldPreferSymbol', 'symbol', 'tags', 'thumbnailUri',
-        })
+        }):
+            assert int(token_id) in [36128], (token_id, token_info)
+            token_db_entry['artifact_mime'] = ''
+            token_db_entry['artifact_ipfs'] = ''
+            token_db_entry['meta_creator'] = ''
+            token_db_entry['display_uri_ipfs'] = ''
+            token_db_entry['tags'] = ''
+            token_db_entry['name'] = ''
+            token_db_entry['description'] = ''
+            continue
 
         if int(token_id) == 152:
             assert 'isBooleanAmount' not in token_info
@@ -137,7 +147,7 @@ if __name__ == '__main__':
         assert len(token_info['creators']) == 1
 
         for tag in token_info['tags']:
-            for ch in [' ', '\n', '\t']:
+            for ch in ['\n', '\t']:
                 assert ch not in tag, (ch, tag)
 
         # if token_info['creators'][0] != token_db_entry['mint_sender']:
@@ -162,6 +172,9 @@ if __name__ == '__main__':
 
     not_in_cache_count = 0
     for token_id, token_db_entry in tqdm(tokens_db.items()):
+        if token_db_entry['artifact_ipfs'] == '':
+            continue
+
         try:
             artifact_fpath = src.ipfs.get_ipfs_fpath(token_db_entry['artifact_ipfs'], 'ipfs1')
             token_db_entry['artifact_file_size'] = artifact_fpath.stat().st_size

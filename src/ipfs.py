@@ -67,7 +67,11 @@ def make_media_db():
 
         token_info = src.utils.read_json(info_fpath)
 
-        assert len(token_info['formats']) == 1
+        if 'formats' not in token_info:
+            assert token_id in [36128], (token_id, token_info)
+            continue
+
+        assert len(token_info['formats']) == 1, (token_id, token_info)
         assert token_info['formats'][0]['uri'] == token_info['artifactUri']
 
         ipfs_uri = src.ipfs.validate_ipfs_uri(token_info['artifactUri'])

@@ -103,7 +103,7 @@ def init_tokens_ds():
             'issuer': token_db_entry['mint_sender'],
             'mint_count': token_db_entry['mint_count'],
             'mint': src.datasets.TrEvent(token_db_entry['mint_row_id']),
-            'artifact_ipfs': src.ipfs.validate_ipfs_uri(token_db_entry['artifact_ipfs']),
+            'artifact_ipfs': src.ipfs.validate_ipfs_uri(token_db_entry['artifact_ipfs']) if token_db_entry['artifact_ipfs'] else '',
             'artifact_mime': token_db_entry['artifact_mime'],
             'artifact_file_size': token_db_entry.get('artifact_file_size', -1),
             'artifact_preview_width': token_db_entry.get('artifact_preview_width', -1),

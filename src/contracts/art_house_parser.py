@@ -38,6 +38,7 @@ def parse_ops(ops):
                     'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
                     'proto.008-PtEdo2Zk.michelson_v1.script_rejected',
                     'proto.008-PtEdo2Zk.contract.balance_too_low',
+                    'proto.008-PtEdo2Zk.gas_exhausted.operation',
                 ], error['id']
                 # if error['id'] == 'proto.008-PtEdo2Zk.michelson_v1.script_rejected':
                 #     print(op_hash, op['parameters'])
