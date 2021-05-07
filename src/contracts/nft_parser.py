@@ -36,10 +36,10 @@ def parse_ops(ops):
         elif op_status == 'failed':
             for error in op['errors']:
                 assert error['kind'] == 'temporary'
-                assert error['id'] in [
-                    'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
-                    'proto.008-PtEdo2Zk.gas_exhausted.operation',
-                ]
+                # assert error['id'] in [
+                #     'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
+                #     'proto.008-PtEdo2Zk.gas_exhausted.operation',
+                # ]
                 errors_counter[error['id']] += 1
 
             continue

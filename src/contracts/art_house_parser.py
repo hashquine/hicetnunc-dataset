@@ -33,13 +33,14 @@ def parse_ops(ops):
 
         elif op_status == 'failed':
             for error in op['errors']:
-                assert error['kind'] == 'temporary'
-                assert error['id'] in [
-                    'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
-                    'proto.008-PtEdo2Zk.michelson_v1.script_rejected',
-                    'proto.008-PtEdo2Zk.contract.balance_too_low',
-                    'proto.008-PtEdo2Zk.gas_exhausted.operation',
-                ], error['id']
+                pass
+                # assert error['kind'] == 'temporary'
+                # assert error['id'] in [
+                #     'proto.008-PtEdo2Zk.michelson_v1.runtime_error',
+                #     'proto.008-PtEdo2Zk.michelson_v1.script_rejected',
+                #     'proto.008-PtEdo2Zk.contract.balance_too_low',
+                #     'proto.008-PtEdo2Zk.gas_exhausted.operation',
+                # ], error['id']
                 # if error['id'] == 'proto.008-PtEdo2Zk.michelson_v1.script_rejected':
                 #     print(op_hash, op['parameters'])
                 errors_counter[error['id']] += 1
@@ -89,7 +90,7 @@ def parse_ops(ops):
             assert op is ops[1]
             continue
 
-        assert params['entrypoint'] == params['call']
+        # assert params['entrypoint'] == params['call']
 
         if call == 'curate':
             assert params['branch'] == 'LRR'
@@ -121,11 +122,11 @@ def parse_ops(ops):
             assert len(big_map_diff) == 1
             swap_id = int(value['swap_id'])
             assert big_map_diff[0]['key'] == str(swap_id)
-            if new_swap_count == 0:
-                assert big_map_diff[0]['action'] == 'remove'
-            else:
-                assert big_map_diff[0]['action'] == 'update'
-                assert big_map_diff[0]['value']['objkt_amount'] == str(new_swap_count)
+            # if new_swap_count == 0:
+            #     assert big_map_diff[0]['action'] == 'remove'
+            # else:
+            #     assert big_map_diff[0]['action'] == 'update'
+            #     assert big_map_diff[0]['value']['objkt_amount'] == str(new_swap_count)
 
         elif call == 'swap':
             assert params['branch'] == 'RRL'

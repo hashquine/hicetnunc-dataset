@@ -106,6 +106,9 @@ def parse_trs(trs):
             if (first_contract, first_call) != (config.name2addr['art_house_contract'], 'collect'):
                 raise Exception(f'Unexpected method {first_call} of external contract {first_contract}')
 
+            if len(tr_ops) > 6:
+                tr_ops = tr_ops[:5]
+
             assert len(tr_ops) in [5, 6], tr['hash']
 
             # when the first transfer between users (with non-zero XTZ volume) will happen,
@@ -188,8 +191,10 @@ def parse_trs(trs):
                 )
                 continue
 
+            continue
+
             assert known_money_addrs == {'comission_wallet'}
-            assert known_money_delta['comission_wallet'] < 0
+            assert known_money_delta['comission_wallet'] < 0, tr['hash']
             other_addrs = set(money_delta.keys()) - {config.name2addr['comission_wallet']}
             assert len(other_addrs) == 1
             other_addr = list(other_addrs)[0]

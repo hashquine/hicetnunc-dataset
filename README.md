@@ -257,7 +257,7 @@ All users, who ever created or owned NFT token.
     <td><code>tzkt_info_logo</code></td>
     <td><code>string</code></td>
     <td><code>"huson.png"</code></td>
-    <td>User logo according to <a href="https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified">tzkt.io metadata</a>. Add prefix <code>https://services.tzkt.io/v1/avatars2/</code> to get the full url</td>
+    <td>User logo according to <a href="https://github.com/hicetnunc2000/hicetnunc/blob/main/FAQ.md#how-to-get-verified">tzkt.io metadata</a>. Add prefix <code>services.tzkt.io/v1/avatars2/</code> to get the full url</td>
 </tr><tr>
     <td><code>tzkt_info_github</code></td>
     <td><code>string</code></td>
@@ -662,6 +662,12 @@ List of possible transitions:
 
 * It is possible to send 0 tokens. [Example](https://tzstats.com/ooXTr2AJBN95EiN3u7NcUg5K7Pkd8nRHNRxa8CbxRNhQZEW4QLN).
 * Sender and receiver can be the same. [Example](https://tzstats.com/opUVg6edpbHtJ94VgHTcwbDnodoegKKwmQ8C6iC9avVX6vZPQd4)
+
+### Strange issue with negative swap count:
+
+
+* https://tzstats.com/opYoTN4LUvNq7F5oiq7a6frW1Q5UubQuXSrDmrqrJGJzHnKaJQQ/47335724
+* https://tzstats.com/oo7Sr2daVXamKTDtajRRvJGmTmYAantjJeLoPkTD6hraVHXQR1B/47335862
 
 
 ## How to update dataset

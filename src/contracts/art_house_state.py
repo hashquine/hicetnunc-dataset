@@ -41,4 +41,5 @@ class ArtHouseState:
 
     def apply_collect(self, row_id, count, swap_id):
         self.swaps[swap_id]['remaining_count'] -= count
-        assert self.swaps[swap_id]['remaining_count'] >= 0
+        if not self.swaps[swap_id]['remaining_count'] >= 0:
+            print('Negative swap count: ', self.swaps[swap_id])

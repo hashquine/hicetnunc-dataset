@@ -30,7 +30,7 @@ print('Filtering NFT, ArtHouse and money ops...')
 tr_count = 0
 
 for tr in src.tr.iter.iter_tr():
-    tr_count +=1
+    tr_count += 1
 
     if tr['time'] >= max_time:
         continue
