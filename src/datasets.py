@@ -111,7 +111,10 @@ def make_dataset(db, fpath, tr_info_db):
         )
         csv_writer.writerow([col for col in cols_order])
         for row in rows:
-            csv_writer.writerow([row[col] for col in cols_order])
+            csv_writer.writerow([
+                str(row[col]).replace('\0', '')
+                for col in cols_order
+            ])
 
     src.utils.write_json(expanded_db, fpath.with_suffix('.json'))
 

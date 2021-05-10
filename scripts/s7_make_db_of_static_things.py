@@ -108,7 +108,7 @@ if __name__ == '__main__':
         token_info_keys = set(token_info.keys())
 
         if not token_info_keys.issubset({
-            'artifactUri', 'creators', 'decimals', 'description', 'displayUri', 'formats',
+            'artifactUri', 'creators', 'prompt', 'decimals', 'description', 'displayUri', 'formats',
             'isBooleanAmount', 'name', 'shouldPreferSymbol', 'symbol', 'tags', 'thumbnailUri',
         }):
             assert int(token_id) in [36128], (token_id, token_info)
@@ -162,8 +162,8 @@ if __name__ == '__main__':
         token_db_entry['meta_creator'] = str(token_info['creators'][0])
         token_db_entry['display_uri_ipfs'] = token_info.get('displayUri', '') or ''
         token_db_entry['tags'] = '\t'.join(token_info['tags'])
-        token_db_entry['name'] = token_info['name']
-        token_db_entry['description'] = token_info['description']
+        token_db_entry['name'] = token_info.get('name', '')
+        token_db_entry['description'] = token_info.get('description', '')
 
 
     print('Adding artifact file size and preview dimensions data...')
