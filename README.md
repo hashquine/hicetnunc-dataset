@@ -1,5 +1,7 @@
 # hicetnunc.xyz open dataset and parsers
 
+> The project development is suspended, parsers will fail to launch on current data
+
 <a href="https://creativecommons.org/licenses/by/4.0/"><img src="https://img.shields.io/badge/license-CC%20BY-green" /></a> <img src="https://img.shields.io/badge/python-3.6-yellow"/> <a href="https://hub.docker.com/repository/docker/pallada92/hicetnunc-dataset"><img src="https://img.shields.io/badge/docker%20hub-pallada92%2Fhicetnunc--dataset-blue" /></a>
 
 [Hic et nunc](http://hicetnunc.xyz) is a new eco-friendly [NFT](https://en.wikipedia.org/wiki/Non-fungible_token) marketplace, built on top of [Tezos](https://en.wikipedia.org/wiki/Tezos) blockchain.

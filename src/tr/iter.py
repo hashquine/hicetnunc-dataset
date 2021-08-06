@@ -80,7 +80,7 @@ def iter_tr(
         assert file_min_stamp % stamp_step == 0, (tr['fpath'], stamp_step)
         assert file_min_stamp <= tr['stamp'] < file_max_stamp, (tr['fpath'], tr['stamp'], stamp_step)
 
-        assert prev_stamp <= tr['stamp'], tr['hash']
+        assert prev_stamp <= tr['stamp'], (tr['hash'], tr['fpath'])
 
         yield tr
 

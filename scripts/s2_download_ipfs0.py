@@ -74,7 +74,7 @@ def get_refs0_to_fetch():
 
     invalid_refs = set()
     for ref in ref_set:
-        if not ref.startswith('ipfs://'):
+        if not ref.startswith('ipfs://') or '[' in ref:
             invalid_refs.add(ref)
     ref_set = ref_set - invalid_refs
     print('Invalid refs0: ', invalid_refs)
